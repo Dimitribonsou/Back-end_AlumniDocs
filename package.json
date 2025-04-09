@@ -1,0 +1,31 @@
+{
+  "name": "projet AlumniDocs",
+  "version": "1.0.0",
+  "description": "projet tutore BONSOU et Jamila",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node index.js",
+    "start": "nodemon index.js"
+  },
+  "author": "BONSOU KENGNI DIMITRI",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "busboy": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.7.0",
+    "mongoose": "^8.4.1",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "^2.18.1",
+    "nodemailer": "^6.9.14",
+    "nodemon": "^3.1.3",
+    "path": "^0.12.7",
+    "typescript": "^5.4.5"
+  }
+}
