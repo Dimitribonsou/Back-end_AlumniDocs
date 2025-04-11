@@ -4,6 +4,8 @@ import cors  from "cors";
 import bodyParser  from "body-parser";
 import etudiantRoute from './routes/EtudiantRoute.js';
 import filesRoute from './routes/FilesRoute.js';
+// import requestsRoute from './routes/RequeteRoute.js';
+
 import path from  'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -23,6 +25,8 @@ app.use('/public',express.static(path.join(__dirname,'./public')));
 //importer les routes du projet
 app.use("/AlumniDocs-API",etudiantRoute);
 app.use("/AlumniDocs-API",filesRoute);
+//Ajouter la route pour la gestion des Requetes
+// app.use("/AlumniDocs-API",requestsRoute);
 
 const port =process.env.PORT || 5000;
 

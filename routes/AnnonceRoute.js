@@ -19,7 +19,9 @@ router.post("/newAnnonce",upload.single('image'), annonceController.AddAnnonce);
 // router.post("/Login", authcontroller.ConnectUser);
 router.delete("/deleteAnnonce/:id", annonceController.DeleteAnnonces);
 router.put("/UpdateAnnonce/:id", annonceController.UpdateAnnonce);
-router.get("/getAnnonce/:id", annonceController.getAnnonce);
+router.get("/getAnnonceDetail/:id", annonceController.getAnnonce);
 router.get("/annonceList",annonceController.AllAnnonces);
+// route permettant d'afficher les annonces par clase
+router.get("/getAnnonceClasse/:id_classe", annonceController.getAnnonceByClasse);
 
 export default router;

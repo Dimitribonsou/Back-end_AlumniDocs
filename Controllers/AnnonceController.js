@@ -100,11 +100,31 @@ const getAnnonce = async (req, res) => {
     res.status(500).send("une erreur c'est produite : " + err);
   }
 };
+// controller permettant d'afficher  les annonces par classes
+const getAnnonceByClasse = async (req, res) => {
+  try {
+    const id_classe = req.params.id_classe;
+    const q = "SELECT a.`id_annonce`, a.`libelle`, `description`, `image`, pb.`date_publication`, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce INNER JOIN classe on classe.id_classe=pb.id_classe WHERE classe.id_classe=?";
+    db.query(q,[id_classe] ,(err, results) => {
+      if (err)
+        res
+          .status(500)
+          .send(
+            "une erreur c'est produite lors de l'execution de la requete "
+          );
+          // retourner le resultat avec le status 200
+      res.status(200).send(JSON.stringify(results));
+    });
+  } catch (err) {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+};
 const annonceController={
     AddAnnonce,
     UpdateAnnonce,
     DeleteAnnonces,
     AllAnnonces,
-    getAnnonce
+    getAnnonce,
+    getAnnonceByClasse
 };
 export default annonceController;  

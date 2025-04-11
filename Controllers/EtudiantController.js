@@ -121,13 +121,13 @@ const AddUser = async (req, res) => {
 // fonction permettant d'enregistrer un etudiant
 const InsertUser = async (req, res) => {
   const password = req.body.password;
-  console.log(password);
+  // console.log(password);
   const passwordhached = await hashPassword(password);
   let q =
-    "INSERT INTO `etudiant`( `nom`, `prenom`, `email`, `telephone`, `password`, `matricule`) VALUES (?,?,?,?,?,?)";
+    "INSERT INTO `etudiant`( `nom`, `prenom`, `email`, `telephone`, `password`, `genre`) VALUES (?,?,?,?,?,?)";
   db.query(
     q,
-    [req.body.nom,req.body.prenom, req.body.email,req.body.telephone, passwordhached, req.body.matricule],
+    [req.body.nom,req.body.prenom, req.body.email,req.body.telephone, passwordhached, req.body.genre],
     (err) => {
       if (err) throw err;
       res.status(200).send("Creation de compte effectuer avec success !");
@@ -225,6 +225,46 @@ const getUser = async (req, res) => {
     res.status(500).send("une erreur c'est produite : " + err);
   }
 };
+const getProfilInfos= (req,res)=>{
+  try {
+    // recuperer l'id de l'etudiant
+    const id_user = req.params.id_user;
+    const q = "SELECT * FROM `profil_etudiant` WHERE  id_etudiant=?  ORDER BY `id_etudiant` ASC";
+    db.query(q,[id_user] ,(err, results) => {
+      if (err)
+        res
+          .status(500)
+          .send(
+            "une erreur c'est produite lors de l'execution de la requete "
+          );
+      res.status(200).send(JSON.stringify(results));
+    });
+  }
+  catch (err) 
+  {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+}
+const getIncriptionInfos= (req,res)=>{
+  try {
+    // recuperer l'id de l'etudiant
+    const id_user = req.params.id_user;
+    const q = "SELECT  `matricule`, `id_classe`, `bac`, `annee_obtension_bac`, `diplome_entrer`, `annee_obtension_diplome`, `id_etudiant` FROM `inscription` WHERE   id_etudiant=?  ORDER BY `id_etudiant` ASC";
+    db.query(q,[id_user] ,(err, results) => {
+      if (err)
+        res
+          .status(500)
+          .send(
+            "une erreur c'est produite lors de l'execution de la requete "
+          );
+      res.status(200).send(JSON.stringify(results));
+    });
+  }
+  catch (err) 
+  {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+}
 const authcontroller={
   ConnectUser,
   AddUser,
@@ -233,6 +273,8 @@ const authcontroller={
   DeconnectUser,
   UpdateUserInfo,
   Welcome,
-  getUser
+  getUser,
+  getProfilInfos,
+  getIncriptionInfos
 };
 export default authcontroller;  

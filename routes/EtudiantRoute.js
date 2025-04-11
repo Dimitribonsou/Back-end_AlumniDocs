@@ -26,7 +26,6 @@ router.use(
   })
 );
 
-
 //route pour l'authentification
 router.post("/NewAccount", authcontroller.AddUser);
 router.get("/", authcontroller.Welcome);
@@ -37,6 +36,9 @@ router.put("/UpdateUser/:id", authcontroller.UpdateUserInfo);
 router.get("/getUser/:id", authcontroller.getUser);
 router.get("/UserList",authcontroller.AllUser);
 router.get("/deconnect",authcontroller.DeconnectUser);
+// definir les routes pour recuperer les infos du profil et de l'etudiant
+router.get("/getProfil/:id_user", authcontroller.getProfilInfos);
+router.get("/getIncription/:id_user", authcontroller.getIncriptionInfos);
 
 //implementation de l'authentification jwt 
 router.post("/Loginjwt", authjwtcontroller.ConnectUser);

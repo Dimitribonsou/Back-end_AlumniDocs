@@ -52,20 +52,21 @@ const ConnectUser = async (req, res, next) => {
       }
 
       if (results.length === 0) {
-        return res.status(401).json({ message: "Email invalide" });
+        return res.json({islogin:false, message: "Email ou mot de passe incorect" });
       }
       //stocker le resultat de la requete dans la constante user
       const user = results[0];
       //verifier si les mots de passe corresponde avec la methode compare
-      const passwordMatch = await bcrypt.compare(password, user.PASSWORD);
+      const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
-        return res.status(401).json({ message: "Mot de passe invalide" });
+        return res.json({islogin:false, message: "Email ou mot de passe incorect" });
       }
      //generer un token apres connection
       const token = generateToken(user.id_utilisateur, user.id_utilisateur);
 // retourner les infos de l'utilisateur connecter au client 
       res.status(200).json({
+        islogin:true,
         token,
         iduser: user.id_utilisateur,
         nom: user.nom,
@@ -76,7 +77,10 @@ const ConnectUser = async (req, res, next) => {
   } catch (err) {
     return res
       .status(500)
-      .json({ message: "Une erreur s'est produite : " + err });
+      .json({
+           islogin:false,
+           message: "Une erreur s'est produite : " + err
+         });
   }
 };
 
