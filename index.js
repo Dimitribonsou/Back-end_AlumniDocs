@@ -29,9 +29,10 @@ app.use("/AlumniDocs-API",filesRoute);
 app.use("/AlumniDocs-API",requestsRoute);
 
 const port =process.env.PORT || 5000;
-
+// const HOST = '172.20.10.3'; // ton IP locale
+const HOST = 'localhost'; // ton IP locale
 app.listen(port, (err) => {
-  console.log(`serveur demarrer sur l'adresse http://localhost:${port}/AlumniDocs-API`);
+  console.log(`serveur demarrer sur l'adresse http://${HOST}:${port}/AlumniDocs-API`);
 });
 
 

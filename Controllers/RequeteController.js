@@ -1,4 +1,5 @@
 import  db from "./../connection.js";
+import fonction from "./function.js";
 //controller permettant d'enregistrer un nouvelle utilisateur
 const Addrequete= async (req, res) => {
   try {
@@ -9,11 +10,12 @@ const Addrequete= async (req, res) => {
 };
 // fonction permettant d'enregistrer un etudiant
 const Insertrequete= async (req, res) => {
+  const annee_scolaire=fonction.obtenirAnneeScolaire();
   let q =
     "INSERT INTO `requete`(`objet`, `description`, `piece_jointe`, `id_categorie`, `annee_scolaire`) VALUES (?,?,?,?,?)";
   db.query(
     q,
-    [req.body.objet,req.body.description, req.body.piece_jointe,req.body.id_categorie,req.body.annee_scolaire],
+    [req.body.objet,req.body.description, req.body.piece_jointe,req.body.id_categorie,annee_scolaire],
     (err) => {
       if (err) throw err;
       res.status(200).send("Requete envoyer  avec success !");
@@ -67,7 +69,7 @@ const DeleteRequete = async (req, res) => {
 // controller permettant d'afficher la liste de tout les etudiants
 const AllRequete = async (req, res) => {
   try {
-     let annee_scolaire="2024-2025";
+     let annee_scolaire=fonction.obtenirAnneeScolaire();
      let statut="en attente";
     const q = "SELECT `id_requete`, `objet`, `description`, `piece_jointe`, `date_envoi`,`statut`, `id_categorie`, FROM `requete` WHERE `annee_scolaire`=? AND statut=? ORDER BY date_envoi  DESC";
     db.query(q,[annee_scolaire,statut], (err, results) => {
@@ -114,7 +116,7 @@ const AddNotification= async (req, res) => {
   };
   // fonction permettant d'enregistrer un etudiant
   const InsertNotification= async (req, res) => {
-    const annee_scolaire="2024-2025";
+    const annee_scolaire=fonction.obtenirAnneeScolaire();
     let q =
       "INSERT INTO `notifications`( `libelle`, `description`, `id_user`, `annee_scolaire`) VALUES (?,?,?,?)";
     db.query(
@@ -127,25 +129,26 @@ const AddNotification= async (req, res) => {
     );
   };
 // controller permettant d'afficher la liste de tout les etudiants
-const getNotification= async (req, res) => {
+const getNotification= async (req, res) => 
+  {
     try {
       const id_etudiant = req.params.id_etudiant;
-      const annee_scolaire="2024-2025";
-      const q = "SELECT `id_notification`, `libelle`, `description`,  DATE(`date_envoi`) AS date_envoi ,TIME(date_envoi) as heure_envoi FROM `notifications` WHERE  `id_user`=? AND `annee_scolaire`=? ";
+      const annee_scolaire=fonction.obtenirAnneeScolaire();
+      const q = "SELECT `id_notification`, `libelle`, `description`,  DATE(`date_envoi`) AS date_envoi ,TIME(date_envoi) as heure_envoi,statut FROM `notifications` WHERE  `id_user`=? AND `annee_scolaire`=? ";
       db.query(q,[id_etudiant,annee_scolaire] ,(err, results) => {
         if (err)
           res
             .status(500)
-            .send(
-              "une erreur c'est produite lors de l'execution de la requete "
-            );
+            .json({message: "une erreur c'est produite lors de l'execution de la requete " });
             // retourner le resultat avec le status 200
-        res.status(200).send(JSON.stringify(results));
+        res.status(200).json(results);
       });
-    } catch (err) {
-      res.status(500).send("une erreur c'est produite : " + err);
-    }
-  };
+    } 
+    catch (err) {
+      res.
+       json({message:"une erreur c'est produite."});
+    };
+}
 const requeteController={
     Addrequete,
     UpdateRequete,
@@ -155,4 +158,4 @@ const requeteController={
     AddNotification,
     getNotification
 };
-export default requeteController;  
+export default requeteController;

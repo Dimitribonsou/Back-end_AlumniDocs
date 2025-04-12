@@ -41,13 +41,13 @@ const verifyToken = (req, res, next) => {
 // Méthode pour la connexion de l'utilisateur
 const ConnectUser = async (req, res, next) => {
   try {
+    console.log("envoyer par jamila");
     const email = req.body.email;
     const password = req.body.password;
     const query = "SELECT `id_utilisateur`, `nom`, `prenom`, `email`, `password` FROM `etudiant` WHERE  `email`=?";
     db.query(query, [email], async (err, results) => {
       if (err) {
         return res
-          .status(500)
           .json({ message: "Une erreur s'est produite lors de la requête" });
       }
 
@@ -70,13 +70,13 @@ const ConnectUser = async (req, res, next) => {
         token,
         iduser: user.id_utilisateur,
         nom: user.nom,
+        telephone: user.telephone,
         email: user.email,
         message: "Connexion réussie",
       });
     });
   } catch (err) {
     return res
-      .status(500)
       .json({
            islogin:false,
            message: "Une erreur s'est produite : " + err

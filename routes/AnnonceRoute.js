@@ -23,5 +23,6 @@ router.get("/getAnnonceDetail/:id", annonceController.getAnnonce);
 router.get("/annonceList",annonceController.AllAnnonces);
 // route permettant d'afficher les annonces par clase
 router.get("/getAnnonceClasse/:id_classe", annonceController.getAnnonceByClasse);
+router.get("/getAnnonceRecent/:id_classe", annonceController.getLastAnnonceByClasse);
 
 export default router;
