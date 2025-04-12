@@ -197,7 +197,7 @@ const AllUser = async (req, res) => {
         res
           .status(500)
           .send(
-            "une erreur c'est produite lors de l'executtion de la requete "
+            "une erreur c'est produite lors de l'executtion de la requete "+err
           );
       res.status(200).send(JSON.stringify(results));
     });
