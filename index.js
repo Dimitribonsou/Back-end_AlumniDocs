@@ -5,6 +5,7 @@ import bodyParser  from "body-parser";
 import etudiantRoute from './routes/EtudiantRoute.js';
 import filesRoute from './routes/FilesRoute.js';
 import requestsRoute from './routes/RequeteRoute.js';
+import AdminRoute from './routes/AdminRoute.js';
 
 import path from  'path';
 import { fileURLToPath } from 'url';
@@ -15,6 +16,8 @@ dotenv.config();
 app.use(cors());
 //importer les midelwares pour autoriser l'envoie des donnees au format json au serveur
 app.use(bodyParser.urlencoded({ extends: true }));
+// Middleware pour parser les données du formulaire
+app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json())
 // Créer les variables de chemin
@@ -22,11 +25,14 @@ app.use(express.json())
     const __dirname = path.dirname(__filename);
 // autoriser l'acces aux fichier images par le serveurs
 app.use('/public',express.static(path.join(__dirname,'./public')));
+// Servir les fichiers statiques depuis le dossier public
+app.use('/public', express.static('public'));
 //importer les routes du projet
 app.use("/AlumniDocs-API",etudiantRoute);
 app.use("/AlumniDocs-API",filesRoute);
 //Ajouter la route pour la gestion des Requetes
 app.use("/AlumniDocs-API",requestsRoute);
+app.use("/AlumniDocs-API",AdminRoute);
 
 const port =process.env.PORT || 5000;
 // const HOST = '172.20.10.3'; // ton IP locale

@@ -10,10 +10,10 @@ dotenv.config();
 //DEFINIR LE CHEMIN DE STOCKAGE DES FICHIERS
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/Documents");
+    cb(null, "public/Documents/Profils/");
   },
   filename: function (req, file, cb) {
-    cb(null,  Date.now() + '-' + file.originalname);
+    cb(null,  Date.now().toFixed() + '-' + file.originalname);
   }
 });
 // Créez un objet "multer" avec les options de stockage 
@@ -39,6 +39,8 @@ router.get("/deconnect",authcontroller.DeconnectUser);
 // definir les routes pour recuperer les infos du profil et de l'etudiant
 router.get("/getProfil/:id_user", authcontroller.getProfilInfos);
 router.get("/getIncription/:id_user", authcontroller.getIncriptionInfos);
+router.post("/newIncription", authcontroller.AddIncription);
+router.post("/newProfil",upload.single('photo'),authcontroller.AddProfil);
 
 //implementation de l'authentification jwt 
 router.post("/Loginjwt", authjwtcontroller.ConnectUser);

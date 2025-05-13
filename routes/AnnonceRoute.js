@@ -5,7 +5,7 @@ import annonceController from './../Controllers/AnnonceController'
 // DE STOCKAGE DES FICHIERS
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/Images");
+    cb(null, "public/Documents/Annonces/");
   },
   filename: function (req, file, cb) {
     cb(null,  Date.now() + '-' + file.originalname);

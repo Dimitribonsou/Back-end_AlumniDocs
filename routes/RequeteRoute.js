@@ -6,10 +6,10 @@ import requeteController from "../Controllers/RequeteController.js";
 // DE STOCKAGE DES FICHIERS
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/Documents/Requetes");
+    cb(null, "public/Documents/Requetes/");
   },
   filename: function (req, file, cb) {
-    cb(null,  Date.now() + '-' + file.originalname);
+    cb(null,  req.body.id_etudiant + '_' + file.originalname);
   }
 });
 // Configuration de multer avec le storage défini

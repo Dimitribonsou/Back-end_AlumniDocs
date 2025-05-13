@@ -63,13 +63,14 @@ const ConnectUser = async (req, res, next) => {
         return res.json({islogin:false, message: "Email ou mot de passe incorect" });
       }
      //generer un token apres connection
-      const token = generateToken(user.id_utilisateur, user.id_utilisateur);
+      const token = generateToken(user.id_utilisateur, user.nom);
 // retourner les infos de l'utilisateur connecter au client 
       res.status(200).json({
         islogin:true,
-        token,
+        token_key:token,
         iduser: user.id_utilisateur,
         nom: user.nom,
+        prenom: user.prenom,
         telephone: user.telephone,
         email: user.email,
         message: "Connexion réussie",

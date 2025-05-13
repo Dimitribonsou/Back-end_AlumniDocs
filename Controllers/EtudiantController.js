@@ -1,6 +1,7 @@
 import  db from "../connection.js";
 //middleware our le cryptage
 import  bcrypt from "bcrypt";
+import fonction from "./function.js";
 
 //###############################################  gerer l'authentification des utilisateurs #################################
 
@@ -225,6 +226,65 @@ const getUser = async (req, res) => {
     res.status(500).send("une erreur c'est produite : " + err);
   }
 };
+/**** Gerer le profil des etudiants */
+//controller permettant d'enregistrer un nouvelle utilisateur
+const AddProfil = async (req, res) => {
+  try {
+    InsertProfil(req, res);
+  } catch (err) {
+    res.send("une erreur c'est produite : " + err);
+  }
+};
+// fonction permettant d'enregistrer un etudiant
+const InsertProfil = async (req, res) => {
+  // appel de la fonction permettant d'obetenir l'annee scolaire en cour.
+  const annee_scolaire= fonction.obtenirAnneeScolaire();
+  // recuperer les donnnees soumis depuis le cote clients
+  const civilite =req.body.civilité
+  const nationalite =req.body.nationalite
+  const date_naissance =req.body.date_naissance
+  const lieuNaissance =req.body.lieu_naissance
+  // const photo =req.body.photo
+  const photo =req.file ? req.file.filename : "user.jpg";
+  const dep_naisance =req.body.dep_naissance
+  const region_naissance =req.body.region_naissance
+  const id_etudiant =req.body.id_etudiant
+  const nom_marital =req.body.nomMarital
+  const quartier =req.body.quartier
+  const nom_pere =req.body.nomPere
+  const tel_pere =req.body.telPere
+  const email_pere =req.body.emailPere
+  const nom_mere =req.body.nomMere
+  const tel_mere =req.body.telMere
+  const email_mere =req.body.emailMere
+  const profession_mere =req.body.professionMere
+  const profession_pere =req.body.professionPere
+  let q =
+    "INSERT INTO `profil_etudiant`( `civilite`, `nationalite`, `date_naissance`, `lieuNaissance`, `photo`, `dep_naisance`, `region_naissance`, `id_etudiant`, `nom_marital`, `quartier`, `nom_pere`, `tel_pere`, `email_pere`, `nom_mere`, `tel_mere`, `email_mere`, `profession_mere`, `profession_pere`,`annee_scolaire`) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+  db.query(
+    q,
+    [civilite,nationalite,date_naissance,lieuNaissance,photo,dep_naisance,region_naissance,id_etudiant,nom_marital,quartier,nom_pere,tel_pere,email_pere,nom_mere,tel_mere,email_mere,profession_mere,profession_pere,annee_scolaire],
+    (err) => {
+      if (err)  res.send("une erreur c'est produite : " + err);
+      res.status(200).send("Profil Completer  avec success !");
+    }
+  );
+};
+const uploadProfilPhoto=(req,res)=>{
+     const id_user = req.params.id;
+     const fileImage="user.jpg";
+  let q =
+    "UPDATE `profil_etudiant` SET `id_profil`='[value-1]',`civilite`='[value-2]',`nationalite`='[value-3]',`date_naissance`='[value-4]',`lieuNaissance`='[value-5]',`photo`='[value-6]',`dep_naisance`='[value-7]',`region_naissance`='[value-8]',`id_etudiant`='[value-9]',`nom_marital`='[value-10]',`quartier`='[value-11]',`nom_pe WHERE 1 ";
+  db.query(
+    q,
+    [fileImage, id_user],
+    (err) => {
+      if (err) throw err;
+      console.log("mise a jour effectuer ave succes ! ");
+      res.status(200).send("mise a jour effectuer avec success !");
+    }
+  ); 
+}
 const getProfilInfos= (req,res)=>{
   try {
     // recuperer l'id de l'etudiant
@@ -245,6 +305,31 @@ const getProfilInfos= (req,res)=>{
     res.status(500).send("une erreur c'est produite : " + err);
   }
 }
+/***** gerer les incriptions des etudiants */
+//controller permettant d'enregistrer un nouvelle utilisateur
+const AddIncription = async (req, res) => {
+  try {
+    InsertInscription(req, res);
+  } catch (err) {
+    res.send("une erreur c'est produite : " + err);
+  }
+};
+// fonction permettant d'enregistrer un etudiant
+const InsertInscription = async (req, res) => {
+  console.log("controler solliciter ...")
+  // appel de la fonction permettant d'obetenir l'annee scolaire en cour.
+  const annee_scolaire= fonction.obtenirAnneeScolaire();
+  let q =
+    "INSERT INTO `inscription`( `matricule`, `id_classe`, `bac`, `annee_obtension_bac`, `diplome_entrer`, `annee_obtension_diplome`, `id_etudiant`, `serie_bac`,`annee_scolaire`,`etablissement_bac`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+  db.query(
+    q,
+    [req.body.matricule,req.body.id_classe, req.body.bac,req.body.annee_obtension_bac, req.body.diplome_entrer, req.body.annee_obtension_diplome,req.body.id_etudiant,req.body.serie_bac,annee_scolaire,req.body.etablissement_bac],
+    (err) => {
+      if (err)  res.send("une erreur c'est produite : " + err);
+      res.status(200).send("Inscription effectuer avec success !");
+    }
+  );
+};
 const getIncriptionInfos= (req,res)=>{
   try {
     // recuperer l'id de l'etudiant
@@ -275,6 +360,8 @@ const authcontroller={
   Welcome,
   getUser,
   getProfilInfos,
-  getIncriptionInfos
+  getIncriptionInfos,
+  AddIncription,
+  AddProfil
 };
 export default authcontroller;  

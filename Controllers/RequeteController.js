@@ -5,19 +5,36 @@ const Addrequete= async (req, res) => {
   try {
     Insertrequete(req, res);
   } catch (err) {
-    res.status(500).send("une erreur c'est produite : " + err);
+    res.send("une erreur c'est produite : " + err);
   }
 };
 // fonction permettant d'enregistrer un etudiant
 const Insertrequete= async (req, res) => {
+  console.log("insertion requete en cours");
+  const objet = req.body.objet;
+  const description = req.body.description;
+  const id_categorie = req.body.id_categorie;
+  const id_etudiant= req.body.id_etudiant;
+  // const nomFichier = req.file.filename;
+  // const fileRequete=req.file;
+  // const reqestFileName=fileRequete.filname;
+  const reqestFileName=req.file ? req.file.filename : "";
+
   const annee_scolaire=fonction.obtenirAnneeScolaire();
+  console.log(annee_scolaire);
   let q =
-    "INSERT INTO `requete`(`objet`, `description`, `piece_jointe`, `id_categorie`, `annee_scolaire`) VALUES (?,?,?,?,?)";
+    "INSERT INTO `requete`(`objet`, `description`, `piece_jointe`, `id_categorie`, `annee_scolaire`,`id_etudiant`) VALUES (?,?,?,?,?,?)";
   db.query(
     q,
-    [req.body.objet,req.body.description, req.body.piece_jointe,req.body.id_categorie,annee_scolaire],
+    [objet,description, reqestFileName,id_categorie,annee_scolaire,id_etudiant],
     (err) => {
-      if (err) throw err;
+      if (err)
+        {
+          res.send("Une erreur est survenue.");
+          console.log("Une erreur est survenue.");
+          throw err;
+        } 
+          
       res.status(200).send("Requete envoyer  avec success !");
     }
   );
