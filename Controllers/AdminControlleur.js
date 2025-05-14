@@ -105,7 +105,6 @@ const getclasse = async (req, res) => {
 // controller permettant d'afficher la liste de tout les etudiants
 const getStudentClasse = async (req, res) => {
   try {
-    console.log("infos demander")
     const id_etudiant= req.params.id;
     // obtenir l'annee scolaire en cours
     const annee_scolaire=fonction.obtenirAnneeScolaire();
@@ -119,11 +118,9 @@ const getStudentClasse = async (req, res) => {
           );
           // retourner le resultat avec le status 200
       res.status(200).json(results);
-      console.log("infos envoyer")
     });
   } catch (err) {
     res.status(500).send("une erreur c'est produite : " + err);
-    console.log("infos non envoyer")
   }
 };
 
