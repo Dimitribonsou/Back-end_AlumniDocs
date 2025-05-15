@@ -348,13 +348,12 @@ const verifyOTP = async (req, res) => {
                 return res.status(200).json({
                     success: true,
                     message: "Authentification réussie",
-                    data: {
                         token,
                          user: {
                              iduser: session.id_utilisateur,
                              role: session.role
                         }
-                    }
+                    
                 });
             });
         });
