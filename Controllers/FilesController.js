@@ -154,14 +154,7 @@ const uploadDocuments = async (req, res) => {
     console.log("Début de l'upload");
     console.log("Body:", req.body);
     console.log("Files:", req.files);
-   console.table(req.body)
-    if (!req.files || req.files.length === 0) {
-      console.log("Aucun fichier Uploadé");
-      return res.status(400).json({
-        success: false,
-        message: "Aucun fichier n'a été uploadé"
-      });
-    }
+  q
    
     const {
       id_etudiant,

@@ -211,9 +211,126 @@ const AllFiliere = async (req, res) => {
   }
 };
 
+const StatistiqueResult = async (req, res) => {
+    try {
+        // Utiliser des promesses pour gérer les requêtes
+        const getInscriptions = () => {
+            return new Promise((resolve, reject) => {
+                db.query('SELECT COUNT(*) as total_inscriptions FROM inscription', (err, results) => {
+                    if (err) reject(err);
+                    resolve(results[0].total_inscriptions);
+                });
+            });
+        };
 
+        const getAnnonces = () => {
+            return new Promise((resolve, reject) => {
+                db.query('SELECT COUNT(*) as total_annonces FROM publications', (err, results) => {
+                    if (err) reject(err);
+                    resolve(results[0].total_annonces);
+                });
+            });
+        };
 
+        const getRequetes = () => {
+            return new Promise((resolve, reject) => {
+                db.query('SELECT COUNT(*) as requetes_en_attente FROM requete WHERE statut=?',[true], (err, results) => {
+                    if (err) reject(err);
+                    resolve(results[0].requetes_en_attente);
+                });
+            });
+        };
 
+        // Exécuter toutes les requêtes en parallèle
+        const [total_inscriptions, total_annonces, requetes_en_attente] = await Promise.all([
+            getInscriptions(),
+            getAnnonces(),
+            getRequetes()
+        ]);
+
+        // Retourner les statistiques
+        res.status(200).json({
+            success: true,
+            data: {
+                total_inscriptions,
+                total_annonces,
+                requetes_en_attente
+            }
+        });
+    } catch (error) {
+        console.error('Erreur lors de la récupération des statistiques:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération des statistiques',
+            error: error.message
+        });
+    }
+};
+const  StatChartJs= async (req,res)=>{
+   try {
+          // Utiliser des promesses pour gérer les requêtes
+          const getInscriptionsByMonth = () => {
+            return new Promise((resolve, reject) => {
+                db.query(`SELECT cr.libelle AS categorie, COUNT(r.id_requete) AS total
+                    FROM requete r
+                    JOIN categorie_requete cr ON r.id_categorie = cr.id_categorie
+                    GROUP BY cr.libelle
+                    ORDER BY total DESC`, (err, results) => {
+                    if (err) reject(err);
+                    // Séparer les catégories et les valeurs
+                    const categories = results.map(item => item.categorie);
+                    const valeurs = results.map(item => item.total);
+                    resolve({ categories, valeurs });
+                });
+            });
+        };
+
+        const getRequestByCategirie = () => {
+            return new Promise((resolve, reject) => {
+                db.query(`SELECT MONTH(created_at) AS mois_num, COUNT(*) AS total
+                          FROM inscription
+                          GROUP BY mois_num
+                          ORDER BY mois_num`, (err, results) => {
+                    if (err) reject(err);
+                    // Séparer les mois et les inscriptions
+                    const mois = results.map(item => {
+                        const moisNoms = [
+                            'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+                        ];
+                        return moisNoms[item.mois_num - 1];
+                    });
+                    const inscriptions = results.map(item => item.total);
+                    resolve({ mois, inscriptions });
+                });
+            });
+        };
+
+          // Exécuter toutes les requêtes en parallèle
+          const [dataRequetes, dataInscriptions] = await Promise.all([
+            getInscriptionsByMonth(),
+            getRequestByCategirie()
+        ]);
+
+        // Retourner les statistiques
+        res.status(200).json({
+            success: true,
+            data: {
+                categories: dataRequetes.categories,
+                valeurs: dataRequetes.valeurs,
+                mois: dataInscriptions.mois,
+                inscriptions: dataInscriptions.inscriptions
+            }
+        });
+   } catch (error) {
+    console.error('Erreur lors de la récupération des statistiques:', error);
+    res.status(500).json({
+        success: false,
+        message: 'Erreur lors de la récupération des statistiques',
+        error: error.message
+    });
+   }
+}
 const adminController={
     AddClasse,
     AllClasses,
@@ -224,6 +341,8 @@ const adminController={
     AddFiliere,
     DeleteFiliere,
     AllFiliere,
-    UpdateFiliere
+    UpdateFiliere,
+    StatistiqueResult,
+    StatChartJs
 };
 export default adminController;  

@@ -15,15 +15,15 @@ router.post('/upload',
     FileController.NewFiles
 );
 
-router.post('/upload-documents',
-  express.urlencoded({ extended: true }),
-  FileController.uploadDocuments
-);
 // router.post('/upload-documents',
 //   express.urlencoded({ extended: true }),
-//   FileController.handleUpload,
 //   FileController.uploadDocuments
 // );
+router.post('/upload-documents',
+  express.urlencoded({ extended: true }),
+  FileController.handleUpload,
+  FileController.uploadDocuments
+);
 
 //     // Middleware de gestion d'erreur pour captureStudentName
 //     async (req, res, next) => {
