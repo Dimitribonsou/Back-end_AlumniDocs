@@ -43,8 +43,8 @@ router.post("/newIncription", authcontroller.AddIncription);
 router.post("/newProfil",upload.single('photo'),authcontroller.AddProfil);
 
 //implementation de l'authentification jwt 
-router.post('/Loginjwt', authjwtcontroller.ConnectUser);
-// router.post('/Loginjwt', authjwtcontroller.initiateLogin);
+// router.post('/Loginjwt', authjwtcontroller.ConnectUser);
+router.post('/Loginjwt', authjwtcontroller.initiateLogin);
 router.post('/login-otp', authjwtcontroller.initiateLogin);
 router.post('/verify-otp', authjwtcontroller.verifyOTP);
 // Utilisation du middleware de vérification du jeton JWT

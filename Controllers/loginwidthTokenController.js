@@ -285,8 +285,8 @@ const initiateLogin = async (req, res) => {
 
 // Deuxième étape de connexion (vérification OTP)
 const verifyOTP = async (req, res) => {
+  console.log("debut verfication !")
     const { id_utilisateur, otp } = req.body;
-
     try {
         // 1. Vérifier si une session existe pour cet email
         const checkSessionQuery = `
