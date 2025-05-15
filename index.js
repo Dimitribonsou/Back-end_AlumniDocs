@@ -33,7 +33,10 @@ app.use("/AlumniDocs-API",filesRoute);
 //Ajouter la route pour la gestion des Requetes
 app.use("/AlumniDocs-API",requestsRoute);
 app.use("/AlumniDocs-API",AdminRoute);
-
+// message d'acceuil
+app.get("/",(req,res)=>{
+  res.status(200).send("Welcome to AlumniDocs API Build By DIMIDEV");
+})
 const port =process.env.PORT || 5000;
 // const HOST = '172.20.10.3'; // ton IP locale
 const HOST = 'localhost'; // ton IP locale
