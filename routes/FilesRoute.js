@@ -17,9 +17,13 @@ router.post('/upload',
 
 router.post('/upload-documents',
   express.urlencoded({ extended: true }),
-  FileController.handleUpload,
   FileController.uploadDocuments
 );
+// router.post('/upload-documents',
+//   express.urlencoded({ extended: true }),
+//   FileController.handleUpload,
+//   FileController.uploadDocuments
+// );
 
 //     // Middleware de gestion d'erreur pour captureStudentName
 //     async (req, res, next) => {
@@ -81,5 +85,11 @@ router.post('/upload-documents',
 
 // route pour effectuer le telechargement des fichier
 router.get('/download/:filename', FileController.DownloadFiles);
+
+// Route pour télécharger tous les documents d'un étudiant
+router.get('/download/student/:nom/:prenom/:classe', FileController.downloadStudentDocuments);
+
+// Route pour télécharger tous les documents d'une classe
+router.get('/download/class/:classe', FileController.downloadClassDocuments);
 
 export default router;

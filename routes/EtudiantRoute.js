@@ -10,7 +10,7 @@ dotenv.config();
 //DEFINIR LE CHEMIN DE STOCKAGE DES FICHIERS
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/Documents/Profils/");
+    cb(null, "public/Fichiers/Profils/");
   },
   filename: function (req, file, cb) {
     cb(null,  Date.now().toFixed() + '-' + file.originalname);
@@ -43,9 +43,9 @@ router.post("/newIncription", authcontroller.AddIncription);
 router.post("/newProfil",upload.single('photo'),authcontroller.AddProfil);
 
 //implementation de l'authentification jwt 
-// router.post('/Loginjwt', authjwtcontroller.ConnectUser);
-router.post('/Loginjwt', authjwtcontroller.initiateLogin);
-router.post('/login_otp', authjwtcontroller.initiateLogin);
+router.post('/Loginjwt', authjwtcontroller.ConnectUser);
+// router.post('/Loginjwt', authjwtcontroller.initiateLogin);
+router.post('/login-otp', authjwtcontroller.initiateLogin);
 router.post('/verify-otp', authjwtcontroller.verifyOTP);
 // Utilisation du middleware de vérification du jeton JWT
 router.use("/protected", authjwtcontroller.verifyToken, (req, res) => {

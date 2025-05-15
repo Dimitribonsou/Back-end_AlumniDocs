@@ -6,7 +6,7 @@ import requeteController from "../Controllers/RequeteController.js";
 // DE STOCKAGE DES FICHIERS
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/Documents/Requetes/");
+    cb(null, "public/Fichiers/Requetes/");
   },
   filename: function (req, file, cb) {
     cb(null,  req.body.id_etudiant + '_' + file.originalname);
