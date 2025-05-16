@@ -1,5 +1,12 @@
 import  db from "./../connection.js";
 import fonction from "./function.js";
+//middleware our le cryptage
+import  bcrypt from "bcrypt";
+// fonction de hachage de mot de passe
+async function hashPassword(password) {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
+}
 //******************** Controller pour gerer fonctionnalites lier aux classes les classes ***************** */
 //controller permettant d'enregistrer un nouvelle  classe
 const AddClasse= async (req, res) => {
@@ -330,6 +337,69 @@ const  StatChartJs= async (req,res)=>{
     });
    }
 }
+/**  controller pour gerer les administrateurs */
+//controller permettant d'enregistrer un nouvelle  classe
+const NewAdmin= async (req, res) => {
+  try {
+    InsertAdmin(req, res);
+  } catch (err) {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+};
+// fonction permettant d'enregistrer un etudiant
+const InsertAdmin = async (req, res) => {
+  console.log(req.body)
+  const password = req.body.password;
+  // console.log(password);
+  const passwordhached = await hashPassword(password);
+  let q =
+    "INSERT INTO `admin`(`nom`, `prenom`, `email`, `telephone`, `password`, `code_access`, `genre`) VALUES (?,?,?,?,?,?,?)";
+  db.query(
+    q,
+    [req.body.nom,req.body.prenom, req.body.email,req.body.telephone,passwordhached,req.body.code_access,req.body.genre],
+    (err) => {
+      if (err) throw err;
+      res.status(200).send("Admin enregistrer  avec success !");
+    }
+  );
+};
+// methode permettant de supprimer un administrateur
+const DeleteAdmin = async (req, res) => {
+  try {
+    // recuperer l'id de la classe passer dans l'url
+    const id_admin = req.params.id;
+    const q = "DELETE FROM `admin` WHERE   `id_utilisateur`=? ";
+    db.query(q, [id_admin], (err) => {
+      if (err)
+        res
+          .status(500)
+          .send(
+            "une erreur c'est produite lors de l'execution de la requete : " +
+              err
+          );
+      res.status(200).send("Administrateur suprimer avec success");
+    });
+  } catch (err) {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+};
+// controller permettant d'afficher la liste de tout les Admins
+const AllAdmin = async (req, res) => {
+  try {
+    const q = "SELECT `id_utilisateur`, `nom`, `prenom`, `email`, `telephone`, `password`, `statut_compte`, `code_access`, `genre` FROM `admin` ORDER BY `id_utilisateur` DESC";
+    db.query(q, (err, results) => {
+      if (err)
+        res
+          .status(500)
+          .send(
+            "une erreur c'est produite lors de l'executtion de la requete "+err
+          );
+      res.status(200).send(JSON.stringify(results));
+    });
+  } catch (err) {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+};
 const adminController={
     AddClasse,
     AllClasses,
@@ -342,6 +412,9 @@ const adminController={
     AllFiliere,
     UpdateFiliere,
     StatistiqueResult,
-    StatChartJs
+    StatChartJs,
+    NewAdmin,
+    DeleteAdmin,
+    AllAdmin
 };
 export default adminController;  

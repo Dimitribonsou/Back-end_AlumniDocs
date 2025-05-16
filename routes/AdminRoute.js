@@ -17,4 +17,8 @@ router.get("/FiliereList",adminController.AllFiliere);
 // afficher les satistiques 
 router.get("/statInfos",adminController.StatistiqueResult)
 router.get("/StatChartJS",adminController.StatChartJs)
+// gerer les routes liees aux administrateurs
+router.post("/NewAdmin", adminController.NewAdmin);
+router.delete("/deleteAdmin/:id", adminController.DeleteAdmin);
+router.get("/AdminList",adminController.AllAdmin);
 export default router;
