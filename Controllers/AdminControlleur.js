@@ -11,6 +11,7 @@ const AddClasse= async (req, res) => {
 };
 // fonction permettant d'enregistrer un etudiant
 const InsertClasse = async (req, res) => {
+  console.log(req.body)
   let q =
     "INSERT INTO `classe`(`libelle`, `numero_salle`, `classe_sup`, `niveau`) VALUES (?,?,?,?)";
   db.query(
