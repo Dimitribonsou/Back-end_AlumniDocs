@@ -12,7 +12,7 @@ const AddClasse= async (req, res) => {
 // fonction permettant d'enregistrer un etudiant
 const InsertClasse = async (req, res) => {
   let q =
-    "INSERT INTO `classe`(`libelle`, `numero_salle`, `salle_sup`, `id_niveau`) VALUES (?,?,?,?)";
+    "INSERT INTO `classe`(`libelle`, `numero_salle`, `classe_sup`, `niveau`) VALUES (?,?,?,?)";
   db.query(
     q,
     [req.body.libelle,req.body.numero_salle, req.body.salle_sup,req.body.id_niveau],
@@ -68,7 +68,7 @@ const DeleteClasse = async (req, res) => {
 // controller permettant d'afficher la liste de tout les etudiants
 const AllClasses = async (req, res) => {
   try {
-    const q = "SELECT * FROM `classe` ORDER BY `libelle` ASC";
+    const q = "SELECT * FROM `classe` ORDER BY `id_classe` DESC";
     db.query(q, (err, results) => {
       if (err)
         res
@@ -135,9 +135,7 @@ const AddFiliere= async (req, res) => {
 };
 // fonction permettant d'enregistrer une filiere
 const InsertFiliere = async (req, res) => {
-  console.log("filiere !!!!!")
-  console.log(req.body);
-  console.log(req.body.libelle);
+ 
   let q =
     "INSERT INTO `filiere`( `libelle`) VALUES (?)";
   db.query(
