@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     cb(null, "public/Fichiers/Requetes/");
   },
   filename: function (req, file, cb) {
-    cb(null,  req.body.id_etudiant + '_' + file.originalname);
+    cb(null,  file.originalname);
   }
 });
 // Configuration de multer avec le storage défini

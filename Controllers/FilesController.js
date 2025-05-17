@@ -317,13 +317,52 @@ const downloadClassDocuments = async (req, res) => {
   }
 };
 
+/** gerer l'upload des documents de facon individuel */
+//controller permettant d'enregistrer un nouvelle utilisateur
+const AddDocuments= async (req, res) => {
+  try {
+    InsertDocument(req, res);
+  } catch (err) {
+    res.send("une erreur c'est produite : " + err);
+  }
+};
+// fonction permettant d'enregistrer un etudiant
+const InsertDocument= async (req, res) => {
+  console.log("insertion document en cours");
+  const libelle = req.body.libelle;
+  const id_etudiant= req.body.id_etudiant;
+  // const nomFichier = req.file.filename;
+  // const fileRequete=req.file;
+  // const reqestFileName=fileRequete.filname;
+  const reqestFileName=req.file ? req.file.filename : "";
+
+  const annee_scolaire=fonction.obtenirAnneeScolaire();
+  console.log(annee_scolaire);
+  let q =
+    "INSERT INTO `documents`( `libelle`, `id_etudiant`, `annee_scolaire`,nom_fichier) VALUES (?,?,?,?)";
+  db.query(
+    q,
+    [libelle,id_etudiant,annee_scolaire,reqestFileName],
+    (err) => {
+      if (err)
+        {
+          res.send("Une erreur est survenue.");
+          console.log("Une erreur est survenue.");
+          throw err;
+        } 
+          
+      res.status(200).send("Document Enregistrer  avec success !");
+    }
+  );
+};
 const FileController = {
   handleUpload,
   uploadDocuments,
     NewFiles,
   DownloadFiles,
   downloadStudentDocuments,
-  downloadClassDocuments
+  downloadClassDocuments,
+  AddDocuments
 };
 
 export default FileController;
