@@ -226,6 +226,26 @@ const getUser = async (req, res) => {
     res.status(500).send("une erreur c'est produite : " + err);
   }
 };
+// controller permettant d'afficher la liste de tout les etudiants d'une classe
+const getStudentByClass = async (req, res) => {
+  try {
+    const id_classe = req.params.id_classe;
+    const q = "SELECT  `nom`, `prenom`, `email`, `telephone`, `matricule`, `genre`, cl.libelle ,p.`id_classe`, p.`id_etudiant`, `annee_scolaire` FROM `promotion` p INNER JOIN etudiant etd ON etd.id_utilisateur=p.id_etudiant INNER JOIN classe cl ON cl.id_classe=p.id_classe    ORDER BY etd.`nom` ASC";
+    db.query(q,[id_classe] ,(err, results) => {
+      if (err)
+        res
+          .status(500)
+          .send(
+            "une erreur c'est produite lors de l'execution de la requete "
+          );
+      res.status(200).send(JSON.stringify(results));
+    });
+  }
+  catch (err) 
+  {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+};
 /**** Gerer le profil des etudiants */
 //controller permettant d'enregistrer un nouvelle utilisateur
 const AddProfil = async (req, res) => {
@@ -350,6 +370,114 @@ const getIncriptionInfos= (req,res)=>{
     res.status(500).send("une erreur c'est produite : " + err);
   }
 }
+const getStudentCompleteInfo = async (req, res) => {
+  try {
+    const id_etudiant = req.params.id;
+    const q = `
+      SELECT DISTINCT
+        e.nom,
+        e.prenom,
+        e.email,
+        e.telephone,
+        e.matricule,
+        e.genre as civilite,
+        p.nom_marital,
+        p.nationalite,
+        p.date_naissance,
+        p.region_naissance,
+        p.lieuNaissance,
+        p.dep_naisance as departementNaissance,
+        p.quartier,
+        p.nom_pere,
+        p.tel_pere,
+        p.email_pere,
+        p.profession_pere,
+        p.nom_mere,
+        p.tel_mere,
+        p.email_mere,
+        p.profession_mere,
+        i.annee_scolaire as anneeAcademique,
+        c.libelle as classe,
+        i.bac,
+        i.annee_obtension_bac as anneeObtentionBac,
+        i.diplome_entrer as diplomeEntree,
+        i.annee_obtension_diplome as anneeObtentionDiplome
+      FROM etudiant e
+      LEFT JOIN (
+        SELECT * FROM profil_etudiant 
+        WHERE id_etudiant = ? 
+        ORDER BY id_profil DESC 
+        LIMIT 1
+      ) p ON e.id_utilisateur = p.id_etudiant
+      LEFT JOIN (
+        SELECT * FROM inscription 
+        WHERE id_etudiant = ? 
+        ORDER BY annee_scolaire DESC 
+        LIMIT 1
+      ) i ON e.id_utilisateur = i.id_etudiant
+      LEFT JOIN classe c ON i.id_classe = c.id_classe
+      WHERE e.id_utilisateur = ?
+    `;
+
+    db.query(q, [id_etudiant, id_etudiant, id_etudiant], (err, results) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          message: "Erreur lors de la récupération des informations",
+          error: err.message
+        });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Étudiant non trouvé"
+        });
+      }
+
+      const studentInfo = {
+        civilite: results[0].civilite || "",
+        nom: results[0].nom || "",
+        nomMarital: results[0].nom_marital || "",
+        prenom: results[0].prenom || "",
+        email: results[0].email || "",
+        telephone: results[0].telephone || "",
+        nationalite: results[0].nationalite || "",
+        dateNaissance: results[0].date_naissance || "",
+        regionNaissance: results[0].region_naissance || "",
+        lieuNaissance: results[0].lieuNaissance || "",
+        departementNaissance: results[0].departementNaissance || "",
+        quartier: results[0].quartier || "",
+        anneeAcademique: results[0].anneeAcademique || "",
+        matricule: results[0].matricule || "",
+        classe: results[0].classe || "",
+        bac: results[0].bac || "",
+        anneeObtentionBac: results[0].anneeObtentionBac || "",
+        diplomeEntree: results[0].diplomeEntree || "",
+        anneeObtentionDiplome: results[0].anneeObtentionDiplome || "",
+        nomPere: results[0].nom_pere || "",
+        telPere: results[0].tel_pere || "",
+        emailPere: results[0].email_pere || "",
+        professionPere: results[0].profession_pere || "",
+        nomMere: results[0].nom_mere || "",
+        telMere: results[0].tel_mere || "",
+        emailMere: results[0].email_mere || "",
+        professionMere: results[0].profession_mere || ""
+      };
+
+      res.status(200).json({
+        success: true,
+        data: studentInfo
+      });
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Une erreur s'est produite",
+      error: err.message
+    });
+  }
+};
 const authcontroller={
   ConnectUser,
   AddUser,
@@ -362,6 +490,8 @@ const authcontroller={
   getProfilInfos,
   getIncriptionInfos,
   AddIncription,
-  AddProfil
+  AddProfil,
+  getStudentByClass,
+  getStudentCompleteInfo
 };
 export default authcontroller;  

@@ -36,12 +36,15 @@ router.put("/UpdateUser/:id", authcontroller.UpdateUserInfo);
 router.get("/getUser/:id", authcontroller.getUser);
 router.get("/UserList",authcontroller.AllUser);
 router.get("/deconnect",authcontroller.DeconnectUser);
+
+//afficher la liste des etudiants en fonction des classes
+router.get("/studenClass",authcontroller.getStudentByClass);
 // definir les routes pour recuperer les infos du profil et de l'etudiant
 router.get("/getProfil/:id_user", authcontroller.getProfilInfos);
 router.get("/getIncription/:id_user", authcontroller.getIncriptionInfos);
 router.post("/newIncription", authcontroller.AddIncription);
 router.post("/newProfil",upload.single('photo'),authcontroller.AddProfil);
-
+router.get('/studentDetail/:id', authcontroller.getStudentCompleteInfo);
 //implementation de l'authentification jwt 
 // router.post('/Loginjwt', authjwtcontroller.ConnectUser);
 router.post('/Loginjwt', authjwtcontroller.initiateLogin);
@@ -52,6 +55,7 @@ router.use("/protected", authjwtcontroller.verifyToken, (req, res) => {
   // Accès aux ressources protégées
   res.json({ message: `Bienvenue ${req.username} !` });
 });
+
 
 
 export default router;
