@@ -50,12 +50,6 @@ router.get('/studentDetail/:id', authcontroller.getStudentCompleteInfo);
 router.post('/Loginjwt', authjwtcontroller.initiateLogin);
 router.post('/login-otp', authjwtcontroller.initiateLogin);
 router.post('/verify-otp', authjwtcontroller.verifyOTP);
-// Utilisation du middleware de vérification du jeton JWT
-router.use("/protected", authjwtcontroller.verifyToken, (req, res) => {
-  // Accès aux ressources protégées
-  res.json({ message: `Bienvenue ${req.username} !` });
-});
-
-
+router.get('/profile-completion/:id', authcontroller.getProfileCompletionRate);
 
 export default router;

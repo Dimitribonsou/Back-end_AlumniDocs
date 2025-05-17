@@ -478,6 +478,111 @@ const getStudentCompleteInfo = async (req, res) => {
     });
   }
 };
+//fonction qui retourne le niveau de progression
+const getProfileCompletionRate = async (req, res) => {
+  try {
+    const id_etudiant = req.params.id;
+    
+    // Requête pour vérifier l'inscription
+    const inscriptionQuery = `
+      SELECT COUNT(*) as hasInscription 
+      FROM inscription 
+      WHERE id_etudiant = ?
+    `;
+
+    // Requête pour vérifier le profil
+    const profilQuery = `
+      SELECT COUNT(*) as hasProfil 
+      FROM profil_etudiant 
+      WHERE id_etudiant = ?
+    `;
+
+    // Requête pour vérifier les documents
+    const documentsQuery = `
+      SELECT COUNT(*) as hasDocuments 
+      FROM documents 
+      WHERE id_etudiant = ?
+    `;
+
+    // Exécuter les requêtes en parallèle
+    db.query(inscriptionQuery, [id_etudiant], (err, inscriptionResult) => {
+      if (err) {
+        return res.status(500).json({
+          success: false,
+          message: "Erreur lors de la vérification de l'inscription",
+          error: err.message
+        });
+      }
+
+      db.query(profilQuery, [id_etudiant], (err, profilResult) => {
+        if (err) {
+          return res.status(500).json({
+            success: false,
+            message: "Erreur lors de la vérification du profil",
+            error: err.message
+          });
+        }
+
+        db.query(documentsQuery, [id_etudiant], (err, documentsResult) => {
+          if (err) {
+            return res.status(500).json({
+              success: false,
+              message: "Erreur lors de la vérification des documents",
+              error: err.message
+            });
+          }
+
+          // Calculer le taux de complétion
+          let completionRate = 20; // Taux par défaut après connexion
+
+          // Ajouter 20% si l'inscription est complétée
+          if (inscriptionResult[0].hasInscription > 0) {
+            completionRate += 20;
+          }
+
+          // Ajouter 40% si le profil est complété
+          if (profilResult[0].hasProfil > 0) {
+            completionRate += 40;
+          }
+
+          // Ajouter 20% si des documents sont soumis
+          if (documentsResult[0].hasDocuments > 0) {
+            completionRate += 20;
+          }
+
+          // Préparer la réponse avec les détails
+          const response = {
+            success: true,
+            data: {
+              completionRate: completionRate,
+              details: {
+                hasInscription: inscriptionResult[0].hasInscription > 0,
+                hasProfil: profilResult[0].hasProfil > 0,
+                hasDocuments: documentsResult[0].hasDocuments > 0,
+                breakdown: {
+                  baseRate: 20,
+                  inscriptionRate: inscriptionResult[0].hasInscription > 0 ? 20 : 0,
+                  profilRate: profilResult[0].hasProfil > 0 ? 40 : 0,
+                  documentsRate: documentsResult[0].hasDocuments > 0 ? 20 : 0
+                }
+              }
+            }
+          };
+
+          res.status(200).json(response);
+        });
+      });
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Une erreur s'est produite",
+      error: err.message
+    });
+  }
+};
+
+
 const authcontroller={
   ConnectUser,
   AddUser,
@@ -492,6 +597,7 @@ const authcontroller={
   AddIncription,
   AddProfil,
   getStudentByClass,
-  getStudentCompleteInfo
+  getStudentCompleteInfo,
+  getProfileCompletionRate
 };
 export default authcontroller;  
