@@ -6,7 +6,7 @@ import etudiantRoute from './routes/EtudiantRoute.js';
 import filesRoute from './routes/FilesRoute.js';
 import requestsRoute from './routes/RequeteRoute.js';
 import AdminRoute from './routes/AdminRoute.js';
-
+import AnnonceRoute from './routes/AnnonceRoute.js'
 import path from  'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -30,6 +30,7 @@ app.use('/public', express.static('public'));
 //importer les routes du projet
 app.use("/AlumniDocs-API",etudiantRoute);
 app.use("/AlumniDocs-API",filesRoute);
+app.use("/AlumniDocs-API",AnnonceRoute);
 //Ajouter la route pour la gestion des Requetes
 app.use("/AlumniDocs-API",requestsRoute);
 app.use("/AlumniDocs-API",AdminRoute);

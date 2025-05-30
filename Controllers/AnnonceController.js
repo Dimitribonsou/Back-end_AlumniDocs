@@ -9,14 +9,16 @@ const AddAnnonce= async (req, res) => {
 };
 // fonction permettant d'enregistrer un etudiant
 const InsertAnnonce = async (req, res) => {
+  console.log("requete recu !")
+  const reqestFileName=req.file ? req.file.filename : "";
   let q =
     "INSERT INTO `annonces`( `libelle`, `description`, `image`,`id_admin`) VALUES (?,?,?,?)";
   db.query(
     q,
-    [req.body.libelle,req.body.description, req.body.image,req.body.id_admin],
+    [req.body.libelle,req.body.description, reqestFileName,req.body.id_admin],
     (err) => {
       if (err) throw err;
-      res.status(200).send("Annonce publier  avec success !");
+      res.status(200).send("Annonce enregistrer  avec success !");
     }
   );
 };

@@ -1,7 +1,7 @@
 import express from  "express";
 const router = express.Router();
 import multer  from  "multer";
-import annonceController from './../Controllers/AnnonceController'
+import annonceController from './../Controllers/AnnonceController.js'
 // DE STOCKAGE DES FICHIERS
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
