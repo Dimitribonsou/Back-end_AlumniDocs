@@ -1,4 +1,5 @@
 import  db from "./../connection.js";
+import fonction from "./function.js";
 //controller permettant d'enregistrer un nouvelle utilisateur
 const AddAnnonce= async (req, res) => {
   try {
@@ -106,8 +107,9 @@ const getAnnonce = async (req, res) => {
 const getAnnonceByClasse = async (req, res) => {
   try {
     const id_classe = req.params.id_classe;
-    const q = "SELECT a.`id_annonce`, a.`libelle`, `description`, `image`, pb.`date_publication`, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce INNER JOIN classe on classe.id_classe=pb.id_classe WHERE classe.id_classe=?";
-    db.query(q,[id_classe] ,(err, results) => {
+    const annee_scolaire =fonction.obtenirAnneeScolaire();
+    const q = "SELECT a.`id_annonce`, a.`libelle`, `description`, `image`, DATE(pb.`date_publication`) as date_publication,TIME(pb.`date_publication`) as heure_publication, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce INNER JOIN classe on classe.id_classe=pb.id_classe WHERE classe.id_classe=? AND `annee_scolaire`=? ORDER BY pb.`date_publication` DESC  LIMIT 10";
+    db.query(q,[id_classe,annee_scolaire] ,(err, results) => {
       if (err)
         res
           .status(500)
@@ -125,8 +127,9 @@ const getAnnonceByClasse = async (req, res) => {
 const getLastAnnonceByClasse = async (req, res) => {
   try {
     const id_classe = req.params.id_classe;
-    const q = "SELECT a.`id_annonce`, a.`libelle`, `description`, `image`, pb.`date_publication`, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce INNER JOIN classe on classe.id_classe=pb.id_classe WHERE classe.id_classe=? LIMIT 3";
-    db.query(q,[id_classe] ,(err, results) => {
+    const annee_scolaire =fonction.obtenirAnneeScolaire();
+    const q = "SELECT a.`id_annonce`, a.`libelle`, `description`, `image`, DATE(pb.`date_publication`) as date_publication,TIME(pb.`date_publication`) as heure_publication, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce INNER JOIN classe on classe.id_classe=pb.id_classe WHERE classe.id_classe=? AND `annee_scolaire`=? ORDER BY pb.`date_publication` DESC  LIMIT 3";
+    db.query(q,[id_classe,annee_scolaire] ,(err, results) => {
       if (err)
         res
           .status(500)
