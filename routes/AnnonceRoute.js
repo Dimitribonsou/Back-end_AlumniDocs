@@ -15,9 +15,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 //route pour l'ajout d'une annonce
 router.post("/newAnnonce",upload.single('image'), annonceController.AddAnnonce);
+router.post("/newpublication", annonceController.AddPublication);
 //route pour la connection de l'utilisateur
 // router.post("/Login", authcontroller.ConnectUser);
-router.delete("/deleteAnnonce/:id", annonceController.DeleteAnnonces);
+router.delete("/deleteAnnonce/:id_anonce", annonceController.DeleteAnnonces);
 router.put("/UpdateAnnonce/:id", annonceController.UpdateAnnonce);
 router.get("/getAnnonceDetail/:id", annonceController.getAnnonce);
 router.get("/annonceList",annonceController.AllAnnonces);
