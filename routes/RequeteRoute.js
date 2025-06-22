@@ -20,6 +20,7 @@ router.post("/newRequest",upload.single('piece_jointe'), requeteController.Addre
 router.delete("/deleteRequest/:id_requete", requeteController.DeleteRequete);
 // route pour la mise a jour d'une requete
 router.put("/UpdateRequest/:id_requete", requeteController.UpdateRequete);
+router.put("/UpdateStatutRequest/:id_requete", requeteController.SetRequeteStatut);
 // route pour l'affichage des details d'une requete
 router.get("/getRequestDetail/:id_requete", requeteController.getRequeteDetail);
 // route pour l'affichage des routes d'une requete

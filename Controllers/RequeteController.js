@@ -63,6 +63,30 @@ const modifierRequete = async (req, res) => {
     }
   );
 };
+// methode permettant de modifier le statut d'une requete
+const SetRequeteStatut = async (req, res) => {
+  try {
+    console.log("requete recu !")
+    console.log(req.body)
+    const id_requete = req.params.id_requete;
+  let q =
+    "UPDATE `requete` SET `statut`=? WHERE `id_requete`=?";
+
+  db.query(
+    q,
+    [req.body.statut,id_requete],
+    (err) => {
+      if (err) throw err;
+      res.status(200).send("mise a jour du statut effectuer avec success !");
+      console.log("GOOD")
+    }
+  );
+  } catch (error) {
+    res.status(200).send("Erreur lors de la mise a jour !");
+    console.log("Erreur !")
+  }
+  
+};
 
 // methode permettant de supprimer un etudiant
 const DeleteRequete = async (req, res) => {
@@ -89,7 +113,7 @@ const AllRequete = async (req, res) => {
      let annee_scolaire=fonction.obtenirAnneeScolaire();
      let statut="en attente";
     const q = "SELECT `id_requete`, `objet`, `description`, `piece_jointe`, DATE(`date_envoi`) AS date_envoi,`statut`,CONCAT(etd.nom,' ',etd.prenom) as etudiant ,etd.id_utilisateur as id_etudiant , cr.libelle as type FROM `requete` r INNER JOIN etudiant etd ON etd.id_utilisateur=r.id_etudiant INNER JOIN categorie_requete cr ON cr.id_categorie=r.id_categorie WHERE `annee_scolaire`=? AND statut=? ORDER BY date_envoi DESC";
-    db.query(q,[annee_scolaire,1], (err, results) => {
+    db.query(q,[annee_scolaire,'En attente'], (err, results) => {
       if (err)
         res
           .status(500)
@@ -173,6 +197,7 @@ const requeteController={
     AllRequete,
     getRequeteDetail,
     AddNotification,
-    getNotification
+    getNotification,
+    SetRequeteStatut
 };
 export default requeteController;
