@@ -20,6 +20,7 @@ router.post("/newpublication", annonceController.AddPublication);
 // router.post("/Login", authcontroller.ConnectUser);
 router.delete("/deleteAnnonce/:id_anonce", annonceController.DeleteAnnonces);
 router.put("/UpdateAnnonce/:id", annonceController.UpdateAnnonce);
+router.put("/UpdateStatusAnnonce/:id", annonceController.setStatusAnnonce);
 router.get("/getAnnonceDetail/:id", annonceController.getAnnonce);
 router.get("/annonceList",annonceController.AllAnnonces);
 // route permettant d'afficher les annonces par clase

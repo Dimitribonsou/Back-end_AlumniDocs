@@ -88,8 +88,8 @@ const AllRequete = async (req, res) => {
   try {
      let annee_scolaire=fonction.obtenirAnneeScolaire();
      let statut="en attente";
-    const q = "SELECT `id_requete`, `objet`, `description`, `piece_jointe`, `date_envoi`,`statut`, `id_categorie`, FROM `requete` WHERE `annee_scolaire`=? AND statut=? ORDER BY date_envoi  DESC";
-    db.query(q,[annee_scolaire,statut], (err, results) => {
+    const q = "SELECT `id_requete`, `objet`, `description`, `piece_jointe`, DATE(`date_envoi`) AS date_envoi,`statut`,CONCAT(etd.nom,' ',etd.prenom) as etudiant ,etd.id_utilisateur as id_etudiant , cr.libelle as type FROM `requete` r INNER JOIN etudiant etd ON etd.id_utilisateur=r.id_etudiant INNER JOIN categorie_requete cr ON cr.id_categorie=r.id_categorie WHERE `annee_scolaire`=? AND statut=? ORDER BY date_envoi DESC";
+    db.query(q,[annee_scolaire,1], (err, results) => {
       if (err)
         res
           .status(500)
@@ -97,7 +97,7 @@ const AllRequete = async (req, res) => {
             "une erreur c'est produite lors de l'executtion de la requete "
           );
           // retourner le resultat au format json
-      res.status(200).send(JSON.stringify(results));
+      res.status(200).json(results);
     });
   } catch (err) {
     res.status(500).send("une erreur c'est produite : " + err);
@@ -151,7 +151,7 @@ const getNotification= async (req, res) =>
     try {
       const id_etudiant = req.params.id_etudiant;
       const annee_scolaire=fonction.obtenirAnneeScolaire();
-      const q = "SELECT `id_notification`, `libelle`, `description`,  DATE(`date_envoi`) AS date_envoi ,TIME(date_envoi) as heure_envoi,statut FROM `notifications` WHERE  `id_user`=? AND `annee_scolaire`=? ";
+      const q = "SELECT `id_notification`, `libelle`, `description`,  DATE(`date_envoi`) AS date_envoi ,TIME(date_envoi) as heure_envoi,statut FROM `notifications` WHERE  `id_user`=? AND `annee_scolaire`=? ORDER BY date_envoi DESC";
       db.query(q,[id_etudiant,annee_scolaire] ,(err, results) => {
         if (err)
           res

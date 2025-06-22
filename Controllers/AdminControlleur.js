@@ -400,6 +400,24 @@ const AllAdmin = async (req, res) => {
     res.status(500).send("une erreur c'est produite : " + err);
   }
 };
+// envoyer automatiquement les notifications aux etudiants
+const getnotification= async (req,res)=>{
+  try {
+       const annee_scolaire=fonction.obtenirAnneeScolaire();
+      let q =
+      "INSERT INTO `notifications`( `libelle`, `description`,  `id_user`, `annee_scolaire`, `statut`) VALUES (?,?,?,?,?)";
+    db.query(
+      q,
+      [req.body.libelle,req.body.description, req.body.id_user,annee_scolaire,req.body.statut],
+      (err) => {
+        if (err) throw err;
+        res.status(200).send("Notifications enregistrer  avec success !");
+      }
+    );       
+  } catch (error) {
+     res.status(500).send("Erreur lors de l'Ajout de la notification")
+  }
+}
 const adminController={
     AddClasse,
     AllClasses,
@@ -415,6 +433,7 @@ const adminController={
     StatChartJs,
     NewAdmin,
     DeleteAdmin,
-    AllAdmin
+    AllAdmin,
+    getnotification
 };
 export default adminController;  

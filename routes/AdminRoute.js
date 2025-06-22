@@ -21,4 +21,6 @@ router.get("/StatChartJS",adminController.StatChartJs)
 router.post("/NewAdmin", adminController.NewAdmin);
 router.delete("/deleteAdmin/:id", adminController.DeleteAdmin);
 router.get("/AdminList",adminController.AllAdmin);
+//route pour envoyer automatiquement les notifications aux utilisateurs
+router.post("/NewNotification", adminController.getnotification);
 export default router;

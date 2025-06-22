@@ -86,6 +86,22 @@ const modifierAnnonce = async (req, res) => {
   );
 };
 
+// methode permettant de modifier le statut de l'annonce
+const setStatusAnnonce = async (req, res) => {
+  const id_annonce = req.params.id;
+  let q =
+    "UPDATE `annonces` SET `statut`=?  WHERE id_annonce=? ";
+
+  db.query(
+    q,
+    [1, id_annonce],
+    (err) => {
+      if (err) throw err;
+      res.status(200).send("mise a jour effectuer avec success !");
+    }
+  );
+};
+
 // methode permettant de supprimer un etudiant
 const DeleteAnnonces = async (req, res) => {
   try {
@@ -206,6 +222,7 @@ const annonceController={
     getAnnonce,
     getAnnonceByClasse,
     getLastAnnonceByClasse,
-    AddPublication
+    AddPublication,
+    setStatusAnnonce
 };
 export default annonceController;  
