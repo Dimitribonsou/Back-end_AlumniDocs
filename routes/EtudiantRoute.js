@@ -34,7 +34,7 @@ router.get("/", authcontroller.Welcome);
 router.delete("/deleteUser/:id", authcontroller.Deleteusers);
 router.put("/UpdateUser/:id", authcontroller.UpdateUserInfo);
 router.get("/getUser/:id", authcontroller.getUser);
-router.get("/UserList",authcontroller.AllUser);
+router.get("/UserList",authcontroller.AllStudent);
 router.get("/deconnect",authcontroller.DeconnectUser);
 
 //afficher la liste des etudiants en fonction des classes

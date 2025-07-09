@@ -190,9 +190,40 @@ const Deleteusers = async (req, res) => {
   }
 };
 // controller permettant d'afficher la liste de tout les etudiants
-const AllUser = async (req, res) => {
+const AllStudent = async (req, res) => {
   try {
-    const q = "SELECT `id_utilisateur`, `nom`, `prenom`, `email`, `telephone`, `statut_compte`, `matricule`  FROM `etudiant` ORDER BY `nom` ASC";
+      const q = `SELECT 
+      DISTINCT(p.id_etudiant), 
+      p.id_classe, 
+      p.annee_scolaire,
+      inc.matricule, 
+      etd.nom, 
+      etd.prenom, 
+      etd.email, 
+      etd.telephone,
+      cl.libelle AS classe,
+      GROUP_CONCAT(DISTINCT doc.nom_fichier ORDER BY doc.nom_fichier SEPARATOR ', ') AS documents
+  FROM 
+      promotion p
+  JOIN 
+      etudiant etd ON etd.id_utilisateur = p.id_etudiant
+  JOIN 
+      classe cl ON cl.id_classe = p.id_classe
+  JOIN 
+      inscription inc ON inc.id_etudiant = etd.id_utilisateur
+  LEFT JOIN 
+      documents doc ON doc.id_etudiant = etd.id_utilisateur
+
+  GROUP BY 
+      p.id_classe, 
+      p.id_etudiant, 
+      p.annee_scolaire,
+      inc.matricule, 
+      etd.nom, 
+      etd.prenom, 
+      etd.telephone, 
+      cl.libelle;
+  `;
     db.query(q, (err, results) => {
       if (err)
         res
@@ -586,7 +617,7 @@ const getProfileCompletionRate = async (req, res) => {
 const authcontroller={
   ConnectUser,
   AddUser,
-  AllUser,
+  AllStudent,
   Deleteusers,
   DeconnectUser,
   UpdateUserInfo,

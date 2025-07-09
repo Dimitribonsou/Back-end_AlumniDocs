@@ -14,6 +14,8 @@ router.post("/NewFiliere", adminController.AddFiliere);
 router.delete("/deleteFiliere/:id", adminController.DeleteFiliere);
 router.put("/UpdateFiliere/:id", adminController.UpdateFiliere);
 router.get("/FiliereList",adminController.AllFiliere);
+// route permettant d'obtention de la liste des promotions
+router.get("/PromotionList",adminController.AllPromotion);
 // afficher les satistiques 
 router.get("/statInfos",adminController.StatistiqueResult)
 router.get("/StatChartJS",adminController.StatChartJs)

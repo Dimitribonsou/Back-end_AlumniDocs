@@ -216,6 +216,24 @@ const AllFiliere = async (req, res) => {
     res.status(500).send("une erreur c'est produite : " + err);
   }
 };
+// controller permettant d'afficher la liste de tout les etudiants
+const AllPromotion = async (req, res) => {
+  try {
+    const q = " SELECT DISTINCT (`annee_scolaire`) FROM `promotion`  ORDER BY `annee_scolaire` DESC LIMIT 10";
+    db.query(q, (err, results) => {
+      if (err)
+        res
+          .status(500)
+          .send(
+            "une erreur c'est produite lors de l'executtion de la requete "
+          );
+          // retourner le resultat au format json
+      res.status(200).send(JSON.stringify(results));
+    });
+  } catch (err) {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+};
 
 const StatistiqueResult = async (req, res) => {
     try {
@@ -434,6 +452,7 @@ const adminController={
     NewAdmin,
     DeleteAdmin,
     AllAdmin,
-    getnotification
+    getnotification,
+    AllPromotion
 };
 export default adminController;  
