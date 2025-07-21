@@ -69,6 +69,7 @@ const SetRequeteStatut = async (req, res) => {
     console.log("requete recu !")
     console.log(req.body)
     const id_requete = req.params.id_requete;
+    console.log(id_requete);
   let q =
     "UPDATE `requete` SET `statut`=? WHERE `id_requete`=?";
 
@@ -112,8 +113,8 @@ const AllRequete = async (req, res) => {
   try {
      let annee_scolaire=fonction.obtenirAnneeScolaire();
      let statut="en attente";
-    const q = "SELECT `id_requete`, `objet`, `description`, `piece_jointe`, DATE(`date_envoi`) AS date_envoi,`statut`,CONCAT(etd.nom,' ',etd.prenom) as etudiant ,etd.id_utilisateur as id_etudiant , cr.libelle as type FROM `requete` r INNER JOIN etudiant etd ON etd.id_utilisateur=r.id_etudiant INNER JOIN categorie_requete cr ON cr.id_categorie=r.id_categorie WHERE `annee_scolaire`=? AND statut=? ORDER BY date_envoi DESC";
-    db.query(q,[annee_scolaire,'En attente'], (err, results) => {
+    const q = "SELECT `id_requete`, `objet`, `description`, `piece_jointe`, DATE(`date_envoi`) AS date_envoi,`statut`,CONCAT(etd.nom,' ',etd.prenom) as etudiant ,etd.id_utilisateur as id_etudiant , cr.libelle as type FROM `requete` r INNER JOIN etudiant etd ON etd.id_utilisateur=r.id_etudiant INNER JOIN categorie_requete cr ON cr.id_categorie=r.id_categorie WHERE `annee_scolaire`=?  ORDER BY date_envoi DESC";
+    db.query(q,[annee_scolaire], (err, results) => {
       if (err)
         res
           .status(500)
