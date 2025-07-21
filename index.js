@@ -15,10 +15,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 //importer le midelwares cors pour autoriser la communication avec different serveur
 app.use(cors());
-// app.use(cors({
-//   origin: 'https://ton-frontend.vercel.app',
-//   credentials: true
-// }));
+app.use(cors({
+  origin: 'https://front-end-alumni-docs.vercel.app/',
+  // credentials: true
+}));
 
 //importer les midelwares pour autoriser l'envoie des donnees au format json au serveur
 app.use(bodyParser.urlencoded({ extends: true }));
