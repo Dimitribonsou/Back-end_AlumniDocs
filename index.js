@@ -14,7 +14,7 @@ import dotenv from 'dotenv';
 // Configurer l'acces aux variables d'environnement
 dotenv.config();
 //importer le midelwares cors pour autoriser la communication avec different serveur
-app.use(cors());
+// app.use(cors());
 app.use(cors({
   origin: 'https://front-end-alumni-docs.vercel.app',
   credentials: true
