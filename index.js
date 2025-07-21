@@ -14,10 +14,22 @@ import dotenv from 'dotenv';
 // Configurer l'acces aux variables d'environnement
 dotenv.config();
 //importer le midelwares cors pour autoriser la communication avec different serveur
-// app.use(cors());
+app.use(cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://front-end-alumni-docs.vercel.app'
+];
+
 app.use(cors({
-  origin: 'https://front-end-alumni-docs.vercel.app',
-  credentials: true
+  origin: function (origin, callback) {
+    // autorise les outils comme Postman ou requêtes sans origine
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true // à activer si tu envoies des cookies ou des headers personnalisés
 }));
 
 
