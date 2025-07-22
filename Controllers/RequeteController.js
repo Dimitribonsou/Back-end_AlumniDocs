@@ -66,25 +66,23 @@ const modifierRequete = async (req, res) => {
 // methode permettant de modifier le statut d'une requete
 const SetRequeteStatut = async (req, res) => {
   try {
-    console.log("requete recu !")
-    console.log(req.body)
     const id_requete = req.params.id_requete;
-    console.log(id_requete);
+    // recuperer la date et l'heure actuelle pour mettre a jour la date de modification automatiquement la base de donnee
+    const new_date=new Date().toISOString()
+    const date_modification=new_date.split('T')[0]+' '+new_date.split('T')[1].split('.')[0];
   let q =
-    "UPDATE `requete` SET `statut`=? WHERE `id_requete`=?";
+    "UPDATE `requete` SET `statut`=?,`date_modification`=? WHERE `id_requete`=?";
 
   db.query(
     q,
-    [req.body.statut,id_requete],
+    [req.body.statut,date_modification,id_requete],
     (err) => {
       if (err) throw err;
       res.status(200).send("mise a jour du statut effectuer avec success !");
-      console.log("GOOD")
     }
   );
   } catch (error) {
-    res.status(200).send("Erreur lors de la mise a jour !");
-    console.log("Erreur !")
+    res.status(200).send("Erreur lors de la mise a jour !"+error);
   }
   
 };

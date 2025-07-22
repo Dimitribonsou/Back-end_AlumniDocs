@@ -124,6 +124,22 @@ const InsertUser = async (req, res) => {
   const password = req.body.password;
   // console.log(password);
   const passwordhached = await hashPassword(password);
+  //definir les requetes pour verifier l'existance du mot de passe et de l'adresse email
+  const emailExistQuery = "SELECT * FROM `etudiant` WHERE `email`=?";
+  const phoneExistQuery = "SELECT * FROM `etudiant` WHERE `telephone`=?";
+  db.query(emailExistQuery, [req.body.email], (err, emailResults) => {
+    if (err) throw err;
+    if (emailResults.length > 0) {
+      return res.status(409).send("Adresse mail deja utiliser par un autre compte.");
+    } else {
+      db.query(phoneExistQuery, [req.body.telephone], (err, phoneResults) => {
+        if (err) throw err;
+        if (phoneResults.length > 0) {
+          return res.status(409).send("Numero de telephone deja utiliser par un autre compte.");
+        }
+      });
+    }
+  });
   let q =
     "INSERT INTO `etudiant`( `nom`, `prenom`, `email`, `telephone`, `password`, `genre`) VALUES (?,?,?,?,?,?)";
   db.query(
@@ -131,7 +147,7 @@ const InsertUser = async (req, res) => {
     [req.body.nom,req.body.prenom, req.body.email,req.body.telephone, passwordhached, req.body.genre],
     (err) => {
       if (err) throw err;
-      res.status(200).send("Creation de compte effectuer avec success !");
+      res.status(200).send("Création de compte effectuer avec success !");
     }
   );
 };
