@@ -5,7 +5,7 @@ function obtenirAnneeScolaire() {
   
     let anneeScolaire;
   
-    if (moisActuel >= 8) {
+    if (moisActuel >= 9) {
       // Si nous sommes en août ou après, l'année scolaire commence cette année
       anneeScolaire = `${anneeActuelle}/${anneeActuelle + 1}`;
     } else {

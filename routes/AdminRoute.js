@@ -25,4 +25,8 @@ router.delete("/deleteAdmin/:id", adminController.DeleteAdmin);
 router.get("/AdminList",adminController.AllAdmin);
 //route pour envoyer automatiquement les notifications aux utilisateurs
 router.post("/NewNotification", adminController.getnotification);
+// route pour gerer l'admissibilite des etudiants
+router.put("/UpdateStatut/:id_etudiant",adminController.setStatutEtudiant);
+// route permettant de faire passer un etudiant en classe superieur
+router.put("/makAswinner/:id_etudiant",adminController.setClasseEtudiant);
 export default router;

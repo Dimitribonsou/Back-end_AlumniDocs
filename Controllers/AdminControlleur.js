@@ -116,6 +116,7 @@ const getStudentClasse = async (req, res) => {
     const id_etudiant= req.params.id;
     // obtenir l'annee scolaire en cours
     const annee_scolaire=fonction.obtenirAnneeScolaire();
+    console.log(annee_scolaire);
     const q = "SELECT c.id_classe ,c.libelle as libelle_classe,p.annee_scolaire ,c.niveau as niveau , f.libelle as filiere FROM `promotion` p INNER JOIN classe c ON c.id_classe=p.id_classe  INNER JOIN filiere f ON f.id_filiere=c.id_filiere WHERE id_etudiant=? AND p.annee_scolaire=?";
     db.query(q,[id_etudiant,annee_scolaire] ,(err, results) => {
       if (err)
@@ -436,6 +437,52 @@ const getnotification= async (req,res)=>{
      res.status(500).send("Erreur lors de l'Ajout de la notification")
   }
 }
+// fonction permettant de marquer un etudiant comme Admin ou Echouer
+const setStatutEtudiant=(req,res)=>{
+  try {
+      const statut=req.body.statut
+      // recuperer de l'etudiant passer en parametre
+      const id_etudiant=req.params.id_etudiant
+       // redaction de la requete de mise a  jour
+       const query="UPDATE `inscription` SET `statut`=? WHERE `id_etudiant`=?"
+       // execution de la requete dans la base de donnee
+       db.query(query,[statut,id_etudiant],(err)=>{
+         if(err) throw new err;
+       })
+       res.status(200).send("Statut de l'etudiant mis a jour avec success");
+  } catch (error) {
+    res.status(500).send("Erreur lors de la mise a jour du statut");
+  }
+}
+const setClasseEtudiant=(req,res)=>{
+  try {
+     let classe_superieur=0;
+     // ### premiere etape recuperer l'id de la classe superieur
+    const id_classe=req.body.id_classe
+       const query1="SELECT  `classe_sup` FROM `classe` WHERE id_classe=?"
+       db.query(query1,[id_classe],(err,result)=>{
+         if(err) throw new err;
+         // stocker l'id de la classe superieur dans une variable global
+         classe_superieur=result[0].classe_sup;
+         console.log(classe_superieur);
+         console.log(result);
+       })
+       //### deuxieme etape mettre a jour la classe de l'etudiant dans la base de donnee.
+      // recuperer de l'etudiant passer en parametre
+      const id_etudiant=req.params.id_etudiant
+    
+       // redaction de la requete de mise a  jour
+       const query="UPDATE `inscription` SET `id_classe`=? WHERE `id_etudiant`=?"
+       // execution de la requete dans la base de donnee
+       db.query(query,[classe_superieur,id_etudiant],(err)=>{
+         if(err) throw new err;
+         console.log(classe_superieur)
+         res.status(200).send("Classe de l'etudiant mis a jour avec success");
+       })
+  } catch (error) {
+    res.status(500).send("Erreur lors de la mise a jour de la classe"+error);
+  }
+}
 const adminController={
     AddClasse,
     AllClasses,
@@ -453,6 +500,8 @@ const adminController={
     DeleteAdmin,
     AllAdmin,
     getnotification,
-    AllPromotion
+    AllPromotion,
+    setStatutEtudiant,
+    setClasseEtudiant
 };
 export default adminController;  

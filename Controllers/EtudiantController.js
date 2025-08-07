@@ -130,12 +130,12 @@ const InsertUser = async (req, res) => {
   db.query(emailExistQuery, [req.body.email], (err, emailResults) => {
     if (err) throw err;
     if (emailResults.length > 0) {
-      return res.status(409).send("Adresse mail deja utiliser par un autre compte.");
+       res.send("Adresse mail deja utiliser par un autre compte.");
     } else {
       db.query(phoneExistQuery, [req.body.telephone], (err, phoneResults) => {
         if (err) throw err;
         if (phoneResults.length > 0) {
-          return res.status(409).send("Numero de telephone deja utiliser par un autre compte.");
+          res.send("Numero de telephone deja utiliser par un autre compte.");
         }
       });
     }

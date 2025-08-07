@@ -129,7 +129,7 @@ const AllAnnonces = async (req, res) => {
       annonces.id_annonce,
       annonces.libelle,
       annonces.statut,
-      DATE(annonces.date_publication) AS date_publication,
+      DATE_FORMAT(annonces.date_publication,'%d/%m/%Y') AS date_publication,
       TIME(annonces.date_publication) AS heure_publication,
       a.nom AS nom_admin,
       annonces.annee_scolaire
