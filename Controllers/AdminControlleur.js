@@ -1,4 +1,4 @@
-import  db from "./../connection.js";
+import  db from "../config/connection.js";
 import fonction from "./function.js";
 //middleware our le cryptage
 import  bcrypt from "bcrypt";

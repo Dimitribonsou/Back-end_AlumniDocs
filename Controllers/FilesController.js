@@ -1,7 +1,7 @@
 import path from 'path';
 import multer from 'multer';
 import fs from 'fs';
-import db from "../connection.js";
+import db from "../config/connection.js";
 import fonction from "./function.js";
 import JSZip from 'jszip';
 

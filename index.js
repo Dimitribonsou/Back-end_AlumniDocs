@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+// Configurer l'acces aux variables d'environnement
+dotenv.config();
 import express  from "express";
 const app = express();
 import cors  from "cors";
@@ -8,11 +11,11 @@ import requestsRoute from './routes/RequeteRoute.js';
 import AdminRoute from './routes/AdminRoute.js';
 import AnnonceRoute from './routes/AnnonceRoute.js'
 import ImageRoute from './routes/ImageRoute.js'
+import driveRoutes from './routes/DriveRoutes.js';
+import authRoute from './routes/AuthRoute.js';
+import listAndDownloadRoute from './routes/listAndDownload.js';
 import path from  'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-// Configurer l'acces aux variables d'environnement
-dotenv.config();
 //importer le midelwares cors pour autoriser la communication avec different serveur
 app.use(cors());
 const allowedOrigins = [
@@ -54,6 +57,10 @@ app.use("/AlumniDocs-API",ImageRoute);
 //Ajouter la route pour la gestion des Requetes
 app.use("/AlumniDocs-API",requestsRoute);
 app.use("/AlumniDocs-API",AdminRoute);
+//Ajouter les routes pour l'upload et le listing des fichiers Drive
+app.use("/AlumniDocs-API", driveRoutes);
+app.use("/AlumniDocs-API", authRoute);
+app.use("/AlumniDocs-API", listAndDownloadRoute);
 // message d'acceuil
 app.get("/",(req,res)=>{
   res.status(200).send("Welcome to AlumniDocs API Build By DIMIDEV");

@@ -1,4 +1,4 @@
-import  db from "./../connection.js";
+import  db from "../config/connection.js";
 import fonction from "./function.js";
 //controller permettant d'enregistrer un nouvelle utilisateur
 const AddAnnonce= async (req, res) => {
