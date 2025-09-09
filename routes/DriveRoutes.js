@@ -21,7 +21,7 @@ dotenv.config();
 const router = express.Router();
 
 // Définit le chemin où le token sera sauvegardé
-const TOKEN_PATH = "./../token.json";
+const TOKEN_PATH = "./token.json";
 
 // Fonction pour obtenir un client Google Drive authentifié
 function getAuthenticatedDriveClient() {
@@ -54,7 +54,7 @@ function getAuthenticatedDriveClient() {
 router.post("/upload", upload.single("file"), async (req, res) => {
   try {
     // Vérifie si un fichier a été envoyé
-    if (!req.file) return res.status(400).json({ error: "file manquant" });
+    if (!req.file) return res.status(400).json({ error: "fichier manquant" });
     // Obtient le client Drive authentifié
     const drive = getAuthenticatedDriveClient();
 
