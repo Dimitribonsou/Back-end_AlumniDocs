@@ -1,62 +1,132 @@
-// uploadRoute.js
-//importer la configuration des variables d'environnement
-import dotenv from 'dotenv';
-dotenv.config();
-import { Readable } from "stream";
-// Importe le module express pour créer des routes
+// routes/uploadRoute.js
 import express from "express";
-// Importe la fonction pour obtenir le service Google Drive
-import { getDriveService } from "../config/driveClient.js";
-import upload from "../middlewares/multer.js"; // ton multer memoryStorage
-// Crée un routeur express
+import multer from "multer";
+import { getAuthenticatedDriveClient } from "../driveClient.js";
+import  db from "../config/connection.js";
+import {
+  getOrCreateFolder,
+  findFolderByName,
+  sanitizeFolderName,
+  normalizeNameForKey,
+  bufferToStream
+} from "../utils/driveUtils.js";
+
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() }); // tout en mémoire
 
-// Définit l'ID du dossier Drive où stocker les fichiers (depuis variable d'environnement ou valeur par défaut)
-const DRIVE_FOLDER_ID = process.env.DRIVE_FOLDER_ID || "100e9HV6-mo6OevD4e7SLEKt6BDjI_Wi2";
-// Obtient le service Google Drive
-const drive = await getDriveService();
-// Déclare la route POST /upload pour l'upload de fichiers
+const ROOT_FOLDER_ID = process.env.DRIVE_FOLDER_ID; // Documents_Etudiants
+
+// helper: ensure class folder and store in DB (idempotent)
+async function ensureClassFolder(drive, className) {
+  className = sanitizeFolderName(className);
+
+  // 1. Check DB
+  const [rows] = await db.query(
+    "SELECT id, drive_folder_id FROM classes WHERE name = ? AND root_drive_id = ? LIMIT 1",
+    [className, ROOT_FOLDER_ID]
+  );
+  if (rows.length) return rows[0];
+
+  // 2. Not in DB -> check Drive and create if needed
+  const folder = await getOrCreateFolder(drive, className, ROOT_FOLDER_ID);
+
+  // 3. Persist in DB (handle race with INSERT ... ON DUPLICATE KEY)
+  try {
+    const [res] = await db.query(
+      "INSERT INTO classes (name, drive_folder_id, root_drive_id) VALUES (?, ?, ?)",
+      [className, folder.id, ROOT_FOLDER_ID]
+    );
+    return { id: res.insertId, drive_folder_id: folder.id };
+  } catch (err) {
+    // possible duplicate (concurrency) -> fetch existing
+    const [rows2] = await db.query(
+      "SELECT id, drive_folder_id FROM classes WHERE name = ? AND root_drive_id = ? LIMIT 1",
+      [className, ROOT_FOLDER_ID]
+    );
+    if (rows2.length) return rows2[0];
+    throw err;
+  }
+}
+
+// helper: ensure student folder under class
+async function ensureStudentFolder(drive, classDbRow, studentRef, fullName) {
+  const normalized = normalizeNameForKey(fullName);
+  const displayName = sanitizeFolderName(fullName + (studentRef ? ` (${studentRef})` : ""));
+
+  // check DB students table
+  const [rows] = await db.query(
+    "SELECT id, drive_folder_id FROM students WHERE normalized_name = ? AND class_id = ? LIMIT 1",
+    [normalized, classDbRow.id]
+  );
+  if (rows.length) return { studentDbId: rows[0].id, drive_folder_id: rows[0].drive_folder_id };
+
+  // check Drive under class folder
+  const existing = await findFolderByName(drive, displayName, classDbRow.drive_folder_id);
+  let folderInfo;
+  if (existing) {
+    folderInfo = existing;
+  } else {
+    folderInfo = await getOrCreateFolder(drive, displayName, classDbRow.drive_folder_id);
+  }
+
+  // persist student row
+  try {
+    const [res] = await db.query(
+      "INSERT INTO students (student_ref, full_name, normalized_name, class_id, drive_folder_id) VALUES (?, ?, ?, ?, ?)",
+      [studentRef || null, fullName, normalized, classDbRow.id, folderInfo.id]
+    );
+    return { studentDbId: res.insertId, drive_folder_id: folderInfo.id };
+  } catch (err) {
+    // race: another process inserted -> fetch existing
+    const [rows2] = await db.query(
+      "SELECT id, drive_folder_id FROM students WHERE normalized_name = ? AND class_id = ? LIMIT 1",
+      [normalized, classDbRow.id]
+    );
+    if (rows2.length) return { studentDbId: rows2[0].id, drive_folder_id: rows2[0].drive_folder_id };
+    throw err;
+  }
+}
+
+// Endpoint upload
+// Expect form-data: file (File), className (Text), firstName, lastName, studentRef (optionnel)
 router.post("/upload", upload.single("file"), async (req, res) => {
-  // Vérifie si un fichier a été envoyé
-  if (!req.file) return res.status(400).json({ error: "Aucun fichier envoyé" });
+  try {
+    if (!req.file) return res.status(400).json({ error: "file manquant" });
+    const { className, firstName = "", lastName = "", studentRef } = req.body;
+    if (!className) return res.status(400).json({ error: "className requis" });
 
+    const fullName = (lastName + " " + firstName).trim() || req.body.fullName || "Inconnu";
 
-try {
-    console.log("DRIVE_FOLDER_ID:", process.env.DRIVE_FOLDER_ID);
-    // Prépare les métadonnées du fichier à uploader
-    const fileMetadata = {
-      name: req.file.originalname,
-      parents: [process.env.DRIVE_FOLDER_ID] || [DRIVE_FOLDER_ID],
-    };
-    // Transformer le buffer en flux lisible
-    const stream = new Readable();
-    stream.push(req.file.buffer);
-    stream.push(null);
-    // Prépare les métadonnées et le média pour l'upload
-    const media = {
-      mimeType: req.file.mimetype,
-      body: stream, // on lit directement depuis la mémoire
-    };
-    // Effectue l'upload du fichier vers Google Drive
+    const drive = getAuthenticatedDriveClient();
+
+    // 1) ensure class folder
+    const classRow = await ensureClassFolder(drive, className);
+
+    // 2) ensure student folder
+    const studentRow = await ensureStudentFolder(drive, classRow, studentRef, fullName);
+
+    // 3) upload file into student folder
+    const stream = bufferToStream(req.file.buffer);
+    const fileMetadata = { name: req.file.originalname, parents: [studentRow.drive_folder_id] };
+    const media = { mimeType: req.file.mimetype, body: stream };
+
     const response = await drive.files.create({
       requestBody: fileMetadata,
       media,
-      fields: "id, name, mimeType, parents, webViewLink",
+      fields: "id, name, mimeType, size, webViewLink"
     });
-    // Retourne les informations du fichier uploadé
-    res.json({
-      success: true,
-      file: response.data,
-    });
-  } catch (err) {
 
+    // 4) save document metadata in DB
+    await db.query(
+      "INSERT INTO documents (student_id, drive_file_id, name, mime_type, size_bytes) VALUES (?, ?, ?, ?, ?)",
+      [studentRow.studentDbId, response.data.id, response.data.name, response.data.mimeType, response.data.size || 0]
+    );
+
+    return res.json({ success: true, file: response.data });
+  } catch (err) {
     console.error("Upload error:", err);
-    res.status(500).json({
-      error: "Erreur upload vers Drive",
-      details: err.message,
-    });
+    return res.status(500).json({ error: "Erreur upload vers Drive", details: err.message });
   }
 });
 
-// Exporte le routeur pour l'utiliser dans l'application principale
 export default router;
