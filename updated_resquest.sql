@@ -10,5 +10,7 @@ CREATE TABLE oauth_tokens (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 --ajoustement faites dans la tables documents 025-09-09
-ALTER TABLE documents ADD COLUMN   mime_type VARCHAR(100)
+ALTER TABLE documents ADD COLUMN   lien_fichier VARCHAR(100)
 ALTER TABLE documents ADD COLUMN   drive_file_id VARCHAR(255)
+---ajoustement faites dans la tables CLASSE 025-09-09
+ALTER TABLE classe ADD COLUMN drive_folder_id varchar(255) DEFAULT NULL

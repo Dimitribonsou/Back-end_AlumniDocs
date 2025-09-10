@@ -1,7 +1,4 @@
-// driveRoutes.js
 
-// Importe express pour créer le routeur
-import express from "express";
 //importer la connexion a la base de donnee
 import  db from "../config/connection.js";
 // Importe la fonction pour créer un client OAuth2 Google
@@ -12,18 +9,13 @@ import { google } from "googleapis";
 import { Readable } from "stream";
 // Importe fs pour lire/écrire des fichiers (ici pour stocker le token)
 import fs from "fs";
-import upload from "../middlewares/multer.js"; // ton multer memoryStorage
 // Importe dotenv pour charger les variables d'environnement
 import dotenv from "dotenv";
 // Charge les variables d'environnement
 dotenv.config();
 
-// Crée un routeur express
-const router = express.Router();
-
 // Définit le chemin où le token sera sauvegardé
 const TOKEN_PATH = "./token.json";
-
 // Fonction pour obtenir un client Google Drive authentifié
 function getAuthenticatedDriveClient() {
   // Crée un client OAuth2
@@ -51,8 +43,7 @@ function getAuthenticatedDriveClient() {
   return google.drive({ version: "v3", auth: oAuth2Client });
 }
 
-// Route POST /upload : upload un fichier vers Google Drive
-router.post("/upload", upload.single("file"), async (req, res) => {
+const upload_file = async (req, res, next) => {
   try {
     // Vérifie si un fichier a été envoyé
     if (!req.file) return res.status(400).json({ error: "fichier manquant" });
@@ -65,16 +56,18 @@ router.post("/upload", upload.single("file"), async (req, res) => {
     stream.push(null);
     // Récupère l'id de la classe depuis le corps de la requête
     // const { classe_id } = req.body;
-    const  classe_id  = 44;
-    if (!classe_id) return res.status(400).json({ error: "classe_id manquant" });
+    const classe_id = req.body.classe_id;
+    if (!classe_id)
+      return res.status(400).json({ error: "classe_id manquant" });
 
     // Importe ton modèle Classe (à adapter selon ton ORM, ici exemple Sequelize)
     // Récupère le dossier Drive associé à la classe
     // Utilise la méthode query pour récupérer la classe (exemple avec MySQL)
     // Récupère le dossier Drive associé à la classe (async/await version)
-      db.query(
+    db.query(
       "SELECT drive_folder_id FROM classe WHERE id_classe = ?",
-      [classe_id], async (err, rows) => {
+      [classe_id],
+      async (err, rows) => {
         if (err) {
           console.error("Erreur lors de la récupération de la classe :", err);
           return res.status(500).json({ error: "Erreur serveur" });
@@ -88,51 +81,36 @@ router.post("/upload", upload.single("file"), async (req, res) => {
           name: req.file.originalname,
           parents: [drive_folder_id],
         };
-    
+
         // Prépare le contenu du fichier et son type MIME
         const media = {
           mimeType: req.file.mimetype,
           body: stream,
         };
-    
+
         // Upload le fichier vers Google Drive
         const response = await drive.files.create({
           requestBody: fileMetadata,
           media,
           fields: "id, name, mimeType, parents, webViewLink",
         });
-    
+
         // Ici: sauvegarde en BDD si souhaité (ex: drive_file_id = response.data.id)
-        res.json({ success: true, file: response.data });
-      });
+        req.fileUploadResult = response.data; // Stocke le résultat dans req pour l'utiliser dans le middleware suivant
+        // res.json({ success: true, file: response.data });
+        // Passe au middleware suivant si nécessaire
+        // console.log("Fichier uploadé vers Drive :", response.data);
+        next();
+      }
+    );
   } catch (err) {
     // Affiche l'erreur dans la console
     console.error("Upload error:", err);
     // Retourne une erreur 500 en cas de problème
-    res.status(500).json({ error: "Erreur upload vers Drive", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Erreur upload vers Drive", details: err.message });
   }
-});
+};
 
-// Route GET /list : liste les fichiers du dossier Drive
-router.get("/list", async (req, res) => {
-  try {
-    // Obtient le client Drive authentifié
-    const drive = getAuthenticatedDriveClient();
-    // Liste les fichiers dans le dossier Drive spécifié
-    const response = await drive.files.list({
-      q: `'${process.env.DRIVE_FOLDER_ID}' in parents and trashed=false`,
-      fields: "files(id, name, mimeType, webViewLink)",
-      pageSize: 100,
-    });
-    // Retourne la liste des fichiers en JSON
-    res.json(response.data.files || []);
-  } catch (err) {
-    // Affiche l'erreur dans la console
-    console.error(err);
-    // Retourne une erreur 500 en cas de problème
-    res.status(500).json({ error: "Erreur lors du listing", details: err.message });
-  }
-});
-
-// Exporte le routeur pour l'utiliser
-export default router;
+export default upload_file;

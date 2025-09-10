@@ -59,8 +59,8 @@ app.use("/AlumniDocs-API",ImageRoute);
 app.use("/AlumniDocs-API",requestsRoute);
 app.use("/AlumniDocs-API",AdminRoute);
 //Ajouter les routes pour l'upload et le listing des fichiers Drive
-// app.use("/AlumniDocs-API", driveRoutes);
-app.use("/AlumniDocs-API", uploadRoute);
+app.use("/AlumniDocs-API", driveRoutes);
+// app.use("/AlumniDocs-API", uploadRoute);
 app.use("/AlumniDocs-API", authRoute);
 app.use("/AlumniDocs-API", listAndDownloadRoute);
 // message d'acceuil
