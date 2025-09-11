@@ -18,15 +18,17 @@ const Insertrequete= async (req, res) => {
   // const nomFichier = req.file.filename;
   // const fileRequete=req.file;
   // const reqestFileName=fileRequete.filname;
-  const reqestFileName=req.file ? req.file.filename : "";
-
+  // const reqestFileName=req.file ? req.file.filename : "";
+  // recuperer les informations du fichier uploadé
+  const fileInfo = req.fileUploadResult;
+  console.log("fileInfo",fileInfo);
   const annee_scolaire=fonction.obtenirAnneeScolaire();
   console.log(annee_scolaire);
   let q =
-    "INSERT INTO `requete`(`objet`, `description`, `piece_jointe`, `id_categorie`, `annee_scolaire`,`id_etudiant`) VALUES (?,?,?,?,?,?)";
+    "INSERT INTO `requete`(`objet`, `description`, `piece_jointe`, `id_categorie`, `annee_scolaire`,`id_etudiant`,`lien_fichier`, `drive_file_id`) VALUES (?,?,?,?,?,?,?,?)";
   db.query(
     q,
-    [objet,description, reqestFileName,id_categorie,annee_scolaire,id_etudiant],
+    [objet,description, fileInfo.name,id_categorie,annee_scolaire,id_etudiant, fileInfo.webViewLink, fileInfo.id],
     (err) => {
       if (err)
         {

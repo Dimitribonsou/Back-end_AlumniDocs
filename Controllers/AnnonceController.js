@@ -11,12 +11,15 @@ const AddAnnonce= async (req, res) => {
 // fonction permettant d'enregistrer une nouvelle annonce
 const InsertAnnonce = async (req, res) => {
   const annee_scolaire=fonction.obtenirAnneeScolaire();
-  const reqestFileName=req.file ? req.file.filename : "";
+  // const reqestFileName=req.file ? req.file.filename : "";
+    // recuperer les informations du fichier uploadé
+  const fileInfo = req.fileUploadResult;
+    console.log("fileInfo",fileInfo);
   let q =
-    "INSERT INTO `annonces`( `libelle`, `description`, `image`,`id_admin`,`annee_scolaire`) VALUES (?,?,?,?,?)";
+    "INSERT INTO `annonces`( `libelle`, `description`, `image`,`id_admin`,`annee_scolaire`,`lien_fichier`, `drive_file_id`) VALUES (?,?,?,?,?,?,?)";
   db.query(
     q,
-    [req.body.libelle,req.body.description, reqestFileName,req.body.id_admin,annee_scolaire],
+    [req.body.libelle,req.body.description, fileInfo.name,req.body.id_admin,annee_scolaire,fileInfo.webViewLink, fileInfo.id],
     (err) => {
       if (err) throw err;
       res.status(200).send("Annonce enregistrer  avec success !");
@@ -179,7 +182,7 @@ const getAnnonceByClasse = async (req, res) => {
   try {
     const id_classe = req.params.id_classe;
     const annee_scolaire =fonction.obtenirAnneeScolaire();
-    const q = "SELECT a.`id_annonce`, a.`libelle`, `description`, `image`, DATE(pb.`date_publication`) as date_publication,TIME(pb.`date_publication`) as heure_publication, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce INNER JOIN classe on classe.id_classe=pb.id_classe WHERE classe.id_classe=? AND `annee_scolaire`=? ORDER BY pb.`date_publication` DESC  LIMIT 10";
+    const q = "SELECT a.`id_annonce`, a.`libelle`, `description`, `image`,lien_fichier, DATE(pb.`date_publication`) as date_publication,TIME(pb.`date_publication`) as heure_publication, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce INNER JOIN classe on classe.id_classe=pb.id_classe WHERE classe.id_classe=? AND `annee_scolaire`=? ORDER BY pb.`date_publication` DESC  LIMIT 10";
     db.query(q,[id_classe,annee_scolaire] ,(err, results) => {
       if (err)
         res

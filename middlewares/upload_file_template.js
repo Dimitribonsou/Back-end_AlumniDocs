@@ -1,6 +1,4 @@
 
-//importer la connexion a la base de donnee
-import  db from "../config/connection.js";
 // Importe la fonction pour créer un client OAuth2 Google
 import { createOAuth2Client } from "./../config/authClient.js";
 // Importe le module googleapis
@@ -43,7 +41,7 @@ function getAuthenticatedDriveClient() {
   return google.drive({ version: "v3", auth: oAuth2Client });
 }
 
-const upload_file = async (req, res, next) => {
+const upload_file_template = async (req, res, next) => {
   try {
     // Vérifie si un fichier a été envoyé
     if (!req.file) return res.status(400).json({ error: "fichier manquant" });
@@ -56,26 +54,15 @@ const upload_file = async (req, res, next) => {
     stream.push(null);
     // Récupère l'id de la classe depuis le corps de la requête
     // const { classe_id } = req.body;
-    const classe_id = req.body.classe_id;
-    if (!classe_id)
-      return res.status(400).json({ error: "classe_id manquant" });
-
-    // Importe ton modèle Classe (à adapter selon ton ORM, ici exemple Sequelize)
-    // Récupère le dossier Drive associé à la classe
-    // Utilise la méthode query pour récupérer la classe (exemple avec MySQL)
-    // Récupère le dossier Drive associé à la classe (async/await version)
-    db.query(
-      "SELECT drive_folder_id FROM classe WHERE id_classe = ?",
-      [classe_id],
-      async (err, rows) => {
-        if (err) {
-          console.error("Erreur lors de la récupération de la classe :", err);
-          return res.status(500).json({ error: "Erreur serveur" });
-        }
-        if (!rows || rows.length === 0) {
-          return res.status(404).json({ error: "Classe introuvable" });
-        }
-        const drive_folder_id = rows[0].drive_folder_id;
+    let request_type = req.body.request_type;
+    let  drive_folder_id='';
+     if(request_type!='' && request_type!="Requete")
+          drive_folder_id=process.env.ANNONCE_FOLDER_ID;
+        else
+           drive_folder_id=process.env.REQUEST_FOLDER_ID;
+   
+         console.log("request_type",request_type);
+         console.log("drive_folder_id",drive_folder_id);
         // Prépare les métadonnées du fichier
         const fileMetadata = {
           name: req.file.originalname,
@@ -93,6 +80,14 @@ const upload_file = async (req, res, next) => {
           requestBody: fileMetadata,
           media,
           fields: "id, name, mimeType, parents, webViewLink",
+        });  
+        // ✅ Rendre le fichier lisible par tout le monde
+        drive.permissions.create({
+        fileId: response.data.id,
+        requestBody: {
+            role: "reader",
+            type: "anyone",
+        },
         });
 
         // Ici: sauvegarde en BDD si souhaité (ex: drive_file_id = response.data.id)
@@ -100,9 +95,7 @@ const upload_file = async (req, res, next) => {
         // res.json({ success: true, file: response.data });
         // Passe au middleware suivant si nécessaire
         // console.log("Fichier uploadé vers Drive :", response.data);
-        next();
-      }
-    );
+        next(); 
   } catch (err) {
     // Affiche l'erreur dans la console
     console.error("Upload error:", err);
@@ -112,6 +105,4 @@ const upload_file = async (req, res, next) => {
       .json({ error: "Erreur upload vers Drive", details: err.message });
   }
 };
-
-
-export default upload_file;
+export default upload_file_template;

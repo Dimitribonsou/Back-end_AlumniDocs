@@ -1,21 +1,22 @@
 import express from  "express";
 const router = express.Router();
-import multer  from  "multer";
 import requeteController from "../Controllers/RequeteController.js";
+import upload_file_template from "../middlewares/upload_file_template.js";
+import upload from "../middlewares/multer.js";
 
 // DE STOCKAGE DES FICHIERS
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public/Fichiers/Requetes/");
-  },
-  filename: function (req, file, cb) {
-    cb(null,  file.originalname);
-  }
-});
-// Configuration de multer avec le storage défini
-const upload = multer({ storage: storage });
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "public/Fichiers/Requetes/");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null,  file.originalname);
+//   }
+// });
+// // Configuration de multer avec le storage défini
+// const upload = multer({ storage: storage });
 //route pour l'ajout d'une requete
-router.post("/newRequest",upload.single('piece_jointe'), requeteController.Addrequete);
+router.post("/newRequest",upload.single('piece_jointe'),upload_file_template, requeteController.Addrequete);
 // route pour la suppression d'une requete
 router.delete("/deleteRequest/:id_requete", requeteController.DeleteRequete);
 // route pour la mise a jour d'une requete
