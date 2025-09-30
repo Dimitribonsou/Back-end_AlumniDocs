@@ -51,5 +51,7 @@ router.post('/Loginjwt', authjwtcontroller.initiateLogin);
 router.post('/login-otp', authjwtcontroller.initiateLogin);
 router.post('/verify-otp', authjwtcontroller.verifyOTP);
 router.get('/profile-completion/:id', authcontroller.getProfileCompletionRate);
+//Route pour recuperer les infos sur les types de documents
+router.get('/doc-type-infos/:id_user', authcontroller.getDocTypeInfos);
 
 export default router;
