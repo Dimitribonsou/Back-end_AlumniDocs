@@ -12,7 +12,7 @@ import { google } from "googleapis";
 // Crée un routeur express
 const router = express.Router();
 // Définit le chemin où le token sera sauvegardé
-const TOKEN_PATH = "./token.json";
+const TOKEN_PATH = "../token.json";
 
 // Route GET /auth : lance le processus d'authentification Google
 router.get("/auth", (req, res) => {
@@ -26,6 +26,7 @@ router.get("/auth", (req, res) => {
     prompt: "consent",           // force la demande de refresh_token
     scope: SCOPES,
   });
+  // console.log("Visite cette URL pour autoriser l'application:", authUrl);
   // Redirige l'utilisateur vers l'URL d'autorisation Google
   res.redirect(authUrl);
 });

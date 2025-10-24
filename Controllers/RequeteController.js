@@ -18,15 +18,17 @@ const Insertrequete= async (req, res) => {
   // const nomFichier = req.file.filename;
   // const fileRequete=req.file;
   // const reqestFileName=fileRequete.filname;
-  const reqestFileName=req.file ? req.file.filename : "";
-
+  // const reqestFileName=req.file ? req.file.filename : "";
+  // recuperer les informations du fichier uploadé
+  const fileInfo = req.fileUploadResult;
+  console.log("fileInfo",fileInfo);
   const annee_scolaire=fonction.obtenirAnneeScolaire();
   console.log(annee_scolaire);
   let q =
-    "INSERT INTO `requete`(`objet`, `description`, `piece_jointe`, `id_categorie`, `annee_scolaire`,`id_etudiant`) VALUES (?,?,?,?,?,?)";
+    "INSERT INTO `requete`(`objet`, `description`, `piece_jointe`, `id_categorie`, `annee_scolaire`,`id_etudiant`,`lien_fichier`, `drive_file_id`) VALUES (?,?,?,?,?,?,?,?)";
   db.query(
     q,
-    [objet,description, reqestFileName,id_categorie,annee_scolaire,id_etudiant],
+    [objet,description, fileInfo.name,id_categorie,annee_scolaire,id_etudiant, fileInfo.webViewLink, fileInfo.id],
     (err) => {
       if (err)
         {
@@ -174,7 +176,7 @@ const getNotification= async (req, res) =>
     try {
       const id_etudiant = req.params.id_etudiant;
       const annee_scolaire=fonction.obtenirAnneeScolaire();
-      const q = "SELECT `id_notification`, `libelle`, `description`,  DATE(`date_envoi`) AS date_envoi ,TIME(date_envoi) as heure_envoi,statut FROM `notifications` WHERE  `id_user`=? AND `annee_scolaire`=? ORDER BY date_envoi DESC";
+      const q = "SELECT `id_notification`, `libelle`, `description`,  DATE(`date_envoi`) AS date_envoi ,TIME(date_envoi) as heure_envoi,statut FROM `notifications` WHERE  `id_user`=? AND `annee_scolaire`=? ORDER BY heure_envoi DESC";
       db.query(q,[id_etudiant,annee_scolaire] ,(err, results) => {
         if (err)
           res

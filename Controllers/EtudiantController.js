@@ -417,6 +417,7 @@ const getIncriptionInfos= (req,res)=>{
     res.status(500).send("une erreur c'est produite : " + err);
   }
 }
+
 const getStudentCompleteInfo = async (req, res) => {
   try {
     const id_etudiant = req.params.id;
@@ -628,7 +629,31 @@ const getProfileCompletionRate = async (req, res) => {
     });
   }
 };
-
+//controller permettant d'obtenir les types de documents deja fournis par l'etudiant
+const getDocTypeInfos= (req,res)=>{
+  try {
+    // recuperer l'id de l'etudiant
+    const id_user = req.params.id_user;
+    const q = `SELECT id_etudiant, 
+              GROUP_CONCAT(DISTINCT type SEPARATOR ', ') AS Type_doc
+              FROM documents
+              WHERE id_etudiant = ?
+              GROUP BY id_etudiant`;
+    db.query(q,[id_user] ,(err, results) => {
+      if (err)
+        res
+          .status(500)
+          .send(
+            "une erreur c'est produite lors de l'execution de la requete "
+          );
+      res.status(200).send(JSON.stringify(results));
+    });
+  }
+  catch (err) 
+  {
+    res.status(500).send("une erreur c'est produite : " + err);
+  }
+}
 
 const authcontroller={
   ConnectUser,
@@ -645,6 +670,7 @@ const authcontroller={
   AddProfil,
   getStudentByClass,
   getStudentCompleteInfo,
-  getProfileCompletionRate
+  getProfileCompletionRate,
+  getDocTypeInfos
 };
 export default authcontroller;  

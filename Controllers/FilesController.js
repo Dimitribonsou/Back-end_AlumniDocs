@@ -331,18 +331,21 @@ const InsertDocument= async (req, res) => {
   console.log("insertion document en cours");
   const libelle = req.body.libelle;
   const id_etudiant= req.body.id_etudiant;
+  const DocumentType= req.body.type;
   // const nomFichier = req.file.filename;
   // const fileRequete=req.file;
   // const reqestFileName=fileRequete.filname;
-  const reqestFileName=req.file ? req.file.filename : "";
+  // const reqestFileName=req.file ? req.file.filename : "";
 
   const annee_scolaire=fonction.obtenirAnneeScolaire();
-  console.log(annee_scolaire);
+  // recuperer les infos du fichier apres l'upload sur google drive
+  const driveFileInfo = req.fileUploadResult; // Récupère les infos du middleware upload_file
+  // console.log("Infos du fichier uploadé sur Drive :", driveFileInfo);
   let q =
-    "INSERT INTO `documents`( `libelle`, `id_etudiant`, `annee_scolaire`,nom_fichier) VALUES (?,?,?,?)";
+    "INSERT INTO `documents`( `libelle`, `id_etudiant`, `annee_scolaire`,nom_fichier,drive_file_id,lien_fichier,type) VALUES (?,?,?,?,?,?,?)";
   db.query(
     q,
-    [libelle,id_etudiant,annee_scolaire,reqestFileName],
+    [libelle,id_etudiant,annee_scolaire,driveFileInfo.name,driveFileInfo.id,driveFileInfo.webViewLink,DocumentType],
     (err) => {
       if (err)
         {

@@ -377,11 +377,13 @@ const ConnectUser = async (req, res, next) => {
     const query = "SELECT `id_utilisateur`, `nom`, `prenom`, `email`, `password` FROM `etudiant` WHERE  `email`=?";
     db.query(query, [email], async (err, results) => {
       if (err) {
+        console.error("Erreur lors de la requête SQL:", err);
         return res
           .json({ message: "Une erreur s'est produite lors de la requête" });
       }
 
       if (results.length === 0) {
+        console.log("Aucun utilisateur trouvé avec cet email:", email);
         return res.json({islogin:false, message: "Email ou mot de passe incorect" });
       }
       //stocker le resultat de la requete dans la constante user
@@ -390,11 +392,13 @@ const ConnectUser = async (req, res, next) => {
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
+        console.log("Mot de passe incorrect pour l'utilisateur:", email);
         return res.json({islogin:false, message: "Email ou mot de passe incorect" });
       }
+      console.log("Utilisateur connecté avec succès:", user);
      //generer un token apres connection
       const token = generateToken(user.id_utilisateur, user.nom);
-// retourner les infos de l'utilisateur connecter au client 
+     // retourner les infos de l'utilisateur connecter au client 
       res.status(200).json({
         islogin:true,
         token_key:token,
@@ -407,6 +411,7 @@ const ConnectUser = async (req, res, next) => {
       });
     });
   } catch (err) {
+    console.error("Erreur lors de la connexion:", err);
     return res
       .json({
            islogin:false,

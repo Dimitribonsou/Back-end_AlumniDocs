@@ -2,6 +2,7 @@ import express from  "express";
 const router = express.Router();
 import multer  from  "multer";
 import annonceController from './../Controllers/AnnonceController.js'
+import upload_file_template from "../middlewares/upload_file_template.js";
 // DE STOCKAGE DES FICHIERS
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -14,7 +15,7 @@ const storage = multer.diskStorage({
 // Configuration de multer avec le storage défini
 const upload = multer({ storage: storage });
 //route pour l'ajout d'une annonce
-router.post("/newAnnonce",upload.single('image'), annonceController.AddAnnonce);
+router.post("/newAnnonce",upload.single('image'),upload_file_template, annonceController.AddAnnonce);
 router.post("/newpublication", annonceController.AddPublication);
 //route pour la connection de l'utilisateur
 // router.post("/Login", authcontroller.ConnectUser);
