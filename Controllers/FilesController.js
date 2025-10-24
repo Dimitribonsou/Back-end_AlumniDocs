@@ -331,6 +331,7 @@ const InsertDocument= async (req, res) => {
   console.log("insertion document en cours");
   const libelle = req.body.libelle;
   const id_etudiant= req.body.id_etudiant;
+  const DocumentType= req.body.type;
   // const nomFichier = req.file.filename;
   // const fileRequete=req.file;
   // const reqestFileName=fileRequete.filname;
@@ -341,10 +342,10 @@ const InsertDocument= async (req, res) => {
   const driveFileInfo = req.fileUploadResult; // Récupère les infos du middleware upload_file
   // console.log("Infos du fichier uploadé sur Drive :", driveFileInfo);
   let q =
-    "INSERT INTO `documents`( `libelle`, `id_etudiant`, `annee_scolaire`,nom_fichier,drive_file_id,lien_fichier) VALUES (?,?,?,?,?,?)";
+    "INSERT INTO `documents`( `libelle`, `id_etudiant`, `annee_scolaire`,nom_fichier,drive_file_id,lien_fichier,type) VALUES (?,?,?,?,?,?,?)";
   db.query(
     q,
-    [libelle,id_etudiant,annee_scolaire,driveFileInfo.name,driveFileInfo.id,driveFileInfo.webViewLink],
+    [libelle,id_etudiant,annee_scolaire,driveFileInfo.name,driveFileInfo.id,driveFileInfo.webViewLink,DocumentType],
     (err) => {
       if (err)
         {

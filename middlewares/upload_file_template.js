@@ -25,6 +25,7 @@ function getAuthenticatedDriveClient() {
   // Configure le client OAuth2 avec les tokens
   oAuth2Client.setCredentials(tokens);
   // Écoute les nouveaux tokens pour les sauvegarder (refresh automatique)
+
   oAuth2Client.on("tokens", (t) => {
     if (t.refresh_token) {
       const existing = fs.existsSync(TOKEN_PATH) ? JSON.parse(fs.readFileSync(TOKEN_PATH)) : {};
@@ -41,6 +42,13 @@ function getAuthenticatedDriveClient() {
   return google.drive({ version: "v3", auth: oAuth2Client });
 }
 
+/**
+ * Middleware pour uploader un fichier vers Google Drive
+ * @param {Object} req - Objet Requête
+ * @param {Object} res - Objet Response
+ * @param {Function} next - Fonction à appeler pour continuer le traitement
+ * @throws {Error} - Erreur si le fichier n'est pas envoyé
+ */
 const upload_file_template = async (req, res, next) => {
   try {
     // Vérifie si un fichier a été envoyé
@@ -56,13 +64,14 @@ const upload_file_template = async (req, res, next) => {
     // const { classe_id } = req.body;
     let request_type = req.body.request_type;
     let  drive_folder_id='';
+    //verfie le type de la requete et affecte le dossier correspondant
      if(request_type!='' && request_type!="Requete")
           drive_folder_id=process.env.ANNONCE_FOLDER_ID;
         else
            drive_folder_id=process.env.REQUEST_FOLDER_ID;
    
-         console.log("request_type",request_type);
-         console.log("drive_folder_id",drive_folder_id);
+        //  console.log("request_type",request_type);
+        //  console.log("drive_folder_id",drive_folder_id);
         // Prépare les métadonnées du fichier
         const fileMetadata = {
           name: req.file.originalname,
@@ -79,7 +88,7 @@ const upload_file_template = async (req, res, next) => {
         const response = await drive.files.create({
           requestBody: fileMetadata,
           media,
-          fields: "id, name, mimeType, parents, webViewLink",
+          fields: "id, name, mimeType, parents, webViewLink,webContentLink",
         });  
         // ✅ Rendre le fichier lisible par tout le monde
         drive.permissions.create({
@@ -89,7 +98,6 @@ const upload_file_template = async (req, res, next) => {
             type: "anyone",
         },
         });
-
         // Ici: sauvegarde en BDD si souhaité (ex: drive_file_id = response.data.id)
         req.fileUploadResult = response.data; // Stocke le résultat dans req pour l'utiliser dans le middleware suivant
         // res.json({ success: true, file: response.data });

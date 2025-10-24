@@ -3,4 +3,5 @@ public/Fichiers/
 .env
 code_tmp.txt
 credentials.json
+routes/uploadRoute.js
 

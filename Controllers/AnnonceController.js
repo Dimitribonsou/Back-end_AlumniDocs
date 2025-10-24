@@ -162,7 +162,7 @@ const AllAnnonces = async (req, res) => {
 const getAnnonce = async (req, res) => {
   try {
     const id_annonce = req.params.id;
-    const q = "SELECT a.`id_annonce`, a.`libelle`, `description`, `image`, DATE(pb.`date_publication`) as date_publication,TIME(pb.`date_publication`) as heure_publication, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce  WHERE  pb.id_annonce=?";
+    const q = "SELECT DISTINCT(a.`id_annonce`), a.`libelle`, `description`, `image`, DATE(pb.`date_publication`) as date_publication,TIME(pb.`date_publication`) as heure_publication, `id_admin`, `annee_scolaire`  FROM `annonces` a INNER JOIN publications pb on pb.id_annonce=a.id_annonce  WHERE  pb.id_annonce=?";
     db.query(q,[id_annonce] ,(err, results) => {
       if (err)
         res

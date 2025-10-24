@@ -91,10 +91,16 @@ const upload_file = async (req, res, next) => {
         // Upload le fichier vers Google Drive
         const response = await drive.files.create({
           requestBody: fileMetadata,
-          media,
-          fields: "id, name, mimeType, parents, webViewLink",
+            media,
+           fields: "id, name, mimeType, parents, webViewLink,webContentLink",
         });
-
+       await drive.permissions.create({
+            fileId: response.data.id,
+            requestBody: {
+              role: 'reader',
+              type: 'anyone',
+            }
+        });
         // Ici: sauvegarde en BDD si souhaité (ex: drive_file_id = response.data.id)
         req.fileUploadResult = response.data; // Stocke le résultat dans req pour l'utiliser dans le middleware suivant
         // res.json({ success: true, file: response.data });

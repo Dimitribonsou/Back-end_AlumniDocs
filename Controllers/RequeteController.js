@@ -176,7 +176,7 @@ const getNotification= async (req, res) =>
     try {
       const id_etudiant = req.params.id_etudiant;
       const annee_scolaire=fonction.obtenirAnneeScolaire();
-      const q = "SELECT `id_notification`, `libelle`, `description`,  DATE(`date_envoi`) AS date_envoi ,TIME(date_envoi) as heure_envoi,statut FROM `notifications` WHERE  `id_user`=? AND `annee_scolaire`=? ORDER BY date_envoi DESC";
+      const q = "SELECT `id_notification`, `libelle`, `description`,  DATE(`date_envoi`) AS date_envoi ,TIME(date_envoi) as heure_envoi,statut FROM `notifications` WHERE  `id_user`=? AND `annee_scolaire`=? ORDER BY heure_envoi DESC";
       db.query(q,[id_etudiant,annee_scolaire] ,(err, results) => {
         if (err)
           res
