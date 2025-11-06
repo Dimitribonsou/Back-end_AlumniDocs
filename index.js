@@ -12,7 +12,7 @@ import AdminRoute from './routes/AdminRoute.js';
 import AnnonceRoute from './routes/AnnonceRoute.js'
 import ImageRoute from './routes/ImageRoute.js'
 import driveRoutes from './routes/DriveRoutes.js';
-import uploadRoute from './routes/uploadRoute.js';
+// import uploadRoute from './routes/uploadRoute.js';
 import authRoute from './routes/AuthRoute.js';
 import listAndDownloadRoute from './routes/listAndDownload.js';
 import path from  'path';
